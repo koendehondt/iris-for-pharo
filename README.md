@@ -33,7 +33,7 @@ Metacello new
     onConflict: [ :e | e useIncoming ];
     onUpgrade: [ :e | e useIncoming ];
     ignoreImage;
-    load.
+    load
 ```
 
 ## Start the server
