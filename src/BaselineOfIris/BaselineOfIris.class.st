@@ -14,6 +14,6 @@ BaselineOfIris >> baseline: spec [
 			baseline: 'NeoJSON'
 			with: [ spec repository: 'github://svenvc/NeoJSON/repository' ].
 		spec
-			package: 'MCP-Server'
+			package: 'Iris'
 			with: [ spec requires: #('NeoJSON') ] ]
 ]
