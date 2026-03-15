@@ -29,7 +29,7 @@ Pharo Image (Zinc HTTP server on port 9999)
 ```smalltalk
 Metacello new
     baseline: 'Iris';
-    repository: 'github://koendehondt/iris-for-pharo/src:main';
+    repository: 'github://koendehondt/iris-for-pharo:main';
     onConflict: [ :e | e useIncoming ];
     onUpgrade: [ :e | e useIncoming ];
     ignoreImage;
