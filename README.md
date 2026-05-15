@@ -1,5 +1,7 @@
 [![Pharo 13](https://github.com/koendehondt/iris-for-pharo/actions/workflows/Pharo13.yml/badge.svg)](https://github.com/koendehondt/iris-for-pharo/actions/workflows/Pharo13.yml) [![codecov](https://codecov.io/gh/koendehondt/iris-for-pharo/graph/badge.svg?token=TJ1JGZUBTM)](https://codecov.io/gh/koendehondt/iris-for-pharo)
 
+[![Pharo 14](https://github.com/koendehondt/iris-for-pharo/actions/workflows/Pharo14.yml/badge.svg)](https://github.com/koendehondt/iris-for-pharo/actions/workflows/Pharo14.yml)
+
 # Iris
 
 A [Model Context Protocol](https://modelcontextprotocol.io) (MCP) server running inside a live [Pharo](https://pharo.org) image.
