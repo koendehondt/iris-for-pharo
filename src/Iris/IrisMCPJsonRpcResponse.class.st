@@ -83,12 +83,6 @@ IrisMCPJsonRpcResponse >> jsonrpc [
 ]
 
 { #category : 'accessing' }
-IrisMCPJsonRpcResponse >> jsonrpc: aString [
-
-	jsonrpc := aString
-]
-
-{ #category : 'accessing' }
 IrisMCPJsonRpcResponse >> result [
 
 	^ result

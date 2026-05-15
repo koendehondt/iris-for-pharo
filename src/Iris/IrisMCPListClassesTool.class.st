@@ -14,23 +14,23 @@ IrisMCPListClassesTool >> description [
 { #category : 'executing' }
 IrisMCPListClassesTool >> execute: args [
 
-	| prefix package classes stream |
-	prefix  := args at: 'prefix'  ifAbsent: [ nil ].
+	| prefix package classes result |
+	prefix  := args at: 'prefix' ifAbsent: [ nil ].
 	package := args at: 'package' ifAbsent: [ nil ].
 	classes := Smalltalk globals allClasses
 		select: [ :cls |
-			(prefix  isNil or: [ cls name beginsWith: prefix ])
+			(prefix isNil or: [ cls name beginsWith: prefix ])
 			and: [ package isNil or: [ cls package name = package ] ] ].
-	stream := WriteStream on: String new.
-	(classes asSortedCollection: [ :a :b | a name < b name ])
-		do: [ :cls |
-			stream
-				nextPutAll: cls name;
-				nextPutAll: ' (';
-				nextPutAll: cls package name;
-				nextPutAll: ')';
-				cr ].
-	^ self textResult: stream contents
+	result := String streamContents: [ :stream |
+		(classes asSortedCollection: [ :a :b | a name < b name ])
+			do: [ :cls |
+				stream
+					nextPutAll: cls name;
+					nextPutAll: ' (';
+					nextPutAll: cls package name;
+					nextPutAll: ')';
+					cr ]].
+	^ self textResult: result
 ]
 
 { #category : 'accessing' }

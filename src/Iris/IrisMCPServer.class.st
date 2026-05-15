@@ -40,7 +40,7 @@ IrisMCPServer >> dispatcher: anMCPDispatcher [
 IrisMCPServer >> handleRequest: aZnRequest [
 
 	aZnRequest method = #POST
-		ifFalse: [ ^ self methodNotAllowedResponse ].
+		ifFalse: [ ^ ZnResponse methodNotAllowed: aZnRequest ].
 	(aZnRequest uri path = 'mcp')
 		ifFalse: [ ^ self notFoundResponse ].
 	^ self processJsonRpc: aZnRequest
@@ -53,12 +53,6 @@ IrisMCPServer >> initialize [
 	port := 9999.
 	dispatcher := IrisMCPDispatcher new.
 	dispatcher registerDefaultTools
-]
-
-{ #category : 'responses' }
-IrisMCPServer >> methodNotAllowedResponse [
-
-	^ ZnResponse methodNotAllowed: #POST
 ]
 
 { #category : 'responses' }

@@ -16,52 +16,65 @@ IrisMCPRunTestsTool >> execute: args [
 
 	| className selector class suite result |
 	className := args at: 'class_name' ifAbsent: [ nil ].
-	selector  := args at: 'selector'   ifAbsent: [ nil ].
+	selector  := args at: 'selector' ifAbsent: [ nil ].
 	className ifNil: [ ^ self errorResult: 'Missing required argument: class_name' ].
-	class := Smalltalk at: className asSymbol ifAbsent: [ nil ].
+	class := Smalltalk classNamed: className asSymbol.
 	class ifNil: [ ^ self errorResult: 'Class not found: ' , className ].
 	(class inheritsFrom: TestCase) ifFalse: [ ^ self errorResult: className , ' is not a TestCase subclass' ].
-	suite := selector
-		ifNil:  [ class suite ]
-		ifNotNil: [ class suite select: [ :each | each selector = selector asSymbol ] ].
-	result := suite run.
+	suite := class suite.
+	selector ifNotNil: [
+		suite := suite class new addTests: (suite tests select: [ :each | each selector = selector asSymbol ]) ].
+	result := IrisTestResult new.
+	suite run: result.
 	^ self textResult: (self formatResult: result forClass: className selector: selector)
 ]
 
 { #category : 'printing' }
 IrisMCPRunTestsTool >> formatResult: result forClass: className selector: selector [
 
-	| stream |
-	stream := WriteStream on: String new.
-	stream
-		nextPutAll: 'Ran ';
-		print: result runCount;
-		nextPutAll: ' test';
-		nextPutAll: (result runCount = 1 ifTrue: [''] ifFalse: ['s']);
-		nextPutAll: ' in ';
-		nextPutAll: className; cr.
-	selector ifNotNil: [ stream nextPutAll: ' >> '; nextPutAll: selector; cr ].
-	stream
-		print: result expectedPassCount; nextPutAll: ' passed'; cr;
-		print: result unexpectedFailureCount; nextPutAll: ' failed'; cr;
-		print: result unexpectedErrorCount; nextPutAll: ' errored'; cr.
-	result unexpectedFailures isEmpty ifFalse: [
-		stream cr; nextPutAll: '--- Failures ---'; cr.
-		result unexpectedFailures do: [ :tc |
+	| failureMessages errorMessages |
+	^ String streamContents: [ :stream |
+		selector ifNil: [
 			stream
-				nextPutAll: tc selector;
-				nextPutAll: ': ';
-				nextPutAll: tc description;
-				cr ] ].
-	result unexpectedErrors isEmpty ifFalse: [
-		stream cr; nextPutAll: '--- Errors ---'; cr.
-		result unexpectedErrors do: [ :tc |
+				nextPutAll: 'Ran ';
+				print: result runCount;
+				nextPutAll: (' test' asPluralBasedOn: result runCount);
+				nextPutAll: ' in ';
+				nextPutAll: className;
+				cr]
+		ifNotNil: [
 			stream
-				nextPutAll: tc selector;
-				nextPutAll: ': ';
-				nextPutAll: tc description;
-				cr ] ].
-	^ stream contents
+				nextPutAll: 'Ran ';
+				nextPutAll: className;
+				nextPutAll: ' >> ';
+				nextPutAll: selector;
+				cr ].
+		stream
+			print: result expectedPassCount; nextPutAll: ' passed'; cr;
+			print: result unexpectedFailureCount; nextPutAll: ' failed'; cr;
+			print: result unexpectedErrorCount; nextPutAll: ' errored'; cr.
+		failureMessages := result failureMessages asSortedCollection: [ :some :other | some key < other key ].
+		failureMessages ifNotEmpty: [
+			stream cr; nextPutAll: '--- Failures ---'; cr.
+			failureMessages
+				do: [ :testSelectorAndMessage |
+					stream
+						nextPutAll: testSelectorAndMessage key;
+						cr;
+						nextPutAll: testSelectorAndMessage value ]
+				separatedBy: [ stream cr; cr ].
+			stream cr ].
+		errorMessages := result errorMessages asSortedCollection: [ :some :other | some key < other key ].
+		errorMessages ifNotEmpty: [
+			stream cr; nextPutAll: '--- Errors ---'; cr.
+			errorMessages
+				do: [ :testSelectorAndMessage |
+					stream
+						nextPutAll: testSelectorAndMessage key;
+						cr;
+						nextPutAll: testSelectorAndMessage value ]
+				separatedBy: [ stream cr; cr ].
+			stream cr ] ]
 ]
 
 { #category : 'accessing' }

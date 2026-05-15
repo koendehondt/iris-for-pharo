@@ -7,13 +7,18 @@ Class {
 
 { #category : 'baselines' }
 BaselineOfIris >> baseline: spec [
-	<baseline>
 
+	<baseline>
 	spec for: #common do: [
 		spec
 			baseline: 'NeoJSON'
 			with: [ spec repository: 'github://svenvc/NeoJSON/repository' ].
 		spec
 			package: 'Iris'
-			with: [ spec requires: #('NeoJSON') ] ]
+			with: [ spec requires: #('NeoJSON') ].
+		spec
+			package: 'Iris-TestSupport'.
+		spec
+			package: 'Iris-Tests'
+			with: [ spec requires: #('Iris' 'Iris-TestSupport') ] ]
 ]
