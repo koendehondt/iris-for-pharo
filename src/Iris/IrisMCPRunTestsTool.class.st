@@ -8,16 +8,27 @@ Class {
 { #category : 'accessing' }
 IrisMCPRunTestsTool >> description [
 
-	^ 'Runs a TestCase class (or a single test method) and returns a summary of results including pass/fail/error counts and failure messages.'
+	^ 'Runs a TestCase class (or a single test method) and returns a summary of results including pass/fail/error counts and failure messages. Alternatively, runs all TestCase subclasses in a package.'
 ]
 
 { #category : 'executing' }
 IrisMCPRunTestsTool >> execute: args [
 
-	| className selector class suite result |
+	| className selector package |
 	className := args at: 'class_name' ifAbsent: [ nil ].
-	selector  := args at: 'selector' ifAbsent: [ nil ].
-	className ifNil: [ ^ self errorResult: 'Missing required argument: class_name' ].
+	selector := args at: 'selector' ifAbsent: [ nil ].
+	package := args at: 'package' ifAbsent: [ nil ].
+
+	package ifNotNil: [ ^ self executePackage: package ].
+
+	className ifNil: [ ^ self errorResult: 'Missing required argument: class_name or package' ].
+	^ self executeClass: className selector: selector
+]
+
+{ #category : 'executing' }
+IrisMCPRunTestsTool >> executeClass: className selector: selector [
+
+	| class suite result |
 	class := Smalltalk classNamed: className asSymbol.
 	class ifNil: [ ^ self errorResult: 'Class not found: ' , className ].
 	(class inheritsFrom: TestCase) ifFalse: [ ^ self errorResult: className , ' is not a TestCase subclass' ].
@@ -27,6 +38,21 @@ IrisMCPRunTestsTool >> execute: args [
 	result := IrisTestResult new.
 	suite run: result.
 	^ self textResult: (self formatResult: result forClass: className selector: selector)
+]
+
+{ #category : 'executing' }
+IrisMCPRunTestsTool >> executePackage: packageName [
+
+	| pkg classes suite result |
+	pkg := Smalltalk packageOrganizer packageNamed: packageName ifAbsent: [ nil ].
+	pkg ifNil: [ ^ self errorResult: 'Package not found: ' , packageName ].
+	classes := pkg definedClasses select: [ :c | c inheritsFrom: TestCase ].
+	classes ifEmpty: [ ^ self errorResult: 'No TestCase subclasses found in package: ' , packageName ].
+	suite := TestSuite new.
+	classes do: [ :c | suite addTests: c suite tests ].
+	result := IrisTestResult new.
+	suite run: result.
+	^ self textResult: (self formatResult: result forClass: packageName selector: nil)
 ]
 
 { #category : 'printing' }
@@ -85,14 +111,18 @@ IrisMCPRunTestsTool >> inputSchema [
 		at: 'properties' put: (Dictionary new
 			at: 'class_name' put: (Dictionary new
 				at: 'type' put: 'string';
-				at: 'description' put: 'The name of the TestCase subclass to run';
+				at: 'description' put: 'The name of the TestCase subclass to run. Optional if package is provided.';
 				yourself);
 			at: 'selector' put: (Dictionary new
 				at: 'type' put: 'string';
 				at: 'description' put: 'Optional single test method selector to run. If omitted, all tests in the class are run.';
 				yourself);
+			at: 'package' put: (Dictionary new
+				at: 'type' put: 'string';
+				at: 'description' put: 'The name of the package whose TestCase subclasses to run. If provided, class_name is ignored.';
+				yourself);
 			yourself);
-		at: 'required' put: #('class_name');
+		at: 'required' put: #();
 		yourself
 ]
 
