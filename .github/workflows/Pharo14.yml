@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        smalltalk: [Pharo64-14]]
+        smalltalk: [Pharo64-14]
     name: ${{ matrix.smalltalk }}
     steps:
       - name: Checkout code
