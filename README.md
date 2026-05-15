@@ -10,13 +10,13 @@ It allows Claude Desktop (or any MCP client) to inspect and interact with a runn
 
 ## Tools
 
-| Tool | Description |
-|------|-------------|
-| `get_class` | Returns the full definition and all method sources for a named class |
-| `get_method` | Returns the source of a single method by class name and selector |
-| `list_classes` | Lists all classes, optionally filtered by name prefix or package |
-| `eval` | Evaluates a Smalltalk expression and returns the printString of the result |
-| `run_tests` | Runs a TestCase class (or single method) and returns pass/fail/error summary |
+| Tool | Description | Parameters |
+|------|-------------|------------|
+| `pharo:eval` | Evaluates a Smalltalk expression in the Pharo image and returns the `printString` of the result | `expression` *(string, required)* |
+| `pharo:get_class` | Returns the definition and all method sources for a named class, both instance-side and class-side | `class_name` *(string, required)* |
+| `pharo:get_method` | Returns the source of a single method | `class_name` *(string, required)*, `selector` *(string, required)*, `class_side` *(boolean, optional)* |
+| `pharo:list_classes` | Lists all classes in the image, with optional filtering | `prefix` *(string, optional)*, `package` *(string, optional)* |
+| `pharo:run_tests` | Runs a `TestCase` subclass (or a single test method) and returns pass/fail/error counts with failure messages. Alternatively, runs all `TestCase` subclasses in a package | `class_name` *(string, optional)*, `package` *(string, optional)*, `selector` *(string, optional)* |
 
 ## Architecture
 
