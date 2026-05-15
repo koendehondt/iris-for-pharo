@@ -1,0 +1,18 @@
+SmalltalkCISpec {
+	#loading : [
+		SCIMetacelloLoadSpec {
+			#baseline : 'Iris',
+			#registerInIceberg : true,
+			#platforms : [ #pharo ]
+		}
+	],
+	#testing : {
+    #include : {
+      #packages : [ 'Iris-Tests' ]
+    },
+		#coverage : {
+			#packages : [ 'Iris' ],
+			#format : #lcov
+		}
+	}
+}
