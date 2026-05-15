@@ -47,13 +47,13 @@ server := IrisMCPServer new.
 server start
 ```
 
+Custom port: `(IrisMCPServer onPort: 8888) start`
+
 ## Stop the server
 
 ```smalltalk
 server stop
 ```
-
-Custom port: `(IrisMCPServer onPort: 8888) start`
 
 ## Claude Desktop Configuration
 
