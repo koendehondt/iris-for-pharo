@@ -1,0 +1,36 @@
+name: Pharo 13
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "30 0 * * 1"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        smalltalk: [Pharo64-13]
+    name: ${{ matrix.smalltalk }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0 # Fetch all commits, which is a prerequisite for registering the repo in Iceberg.
+      - name: Set up SmalltalkCI
+        uses: hpi-swa/setup-smalltalkCI@v1
+        with:
+          smalltalk-image: ${{ matrix.smalltalk }}
+      - name: Run tests
+        run: smalltalkci -s ${{ matrix.smalltalk }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        timeout-minutes: 10
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          name: ${{ matrix.smalltalk }}
+          token: ${{ secrets.CODECOV_TOKEN }}
