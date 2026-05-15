@@ -8,8 +8,8 @@ SmalltalkCISpec {
 		}
 	],
 	#testing : {
-    #include : {
-      #packages : [ 'Iris-Tests' ]
+    #exclude : {
+      #packages : [ 'Iris-TestSupport' ]
     },
 		#coverage : {
 			#packages : [ 'Iris' ],
