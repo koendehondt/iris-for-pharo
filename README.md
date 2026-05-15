@@ -47,7 +47,7 @@ server := IrisMCPServer new.
 server start
 ```
 
-Custom port: `(IrisMCPServer onPort: 8888) start`
+By default, the server runs on port 9999. To run on a custom port, 8888 for instance, evaluate `(IrisMCPServer onPort: 8888) start`.
 
 ## Stop the server
 
