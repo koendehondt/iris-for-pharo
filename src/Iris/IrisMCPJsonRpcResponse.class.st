@@ -36,9 +36,9 @@ IrisMCPJsonRpcResponse class >> resultFor: anId value: anObject [
 IrisMCPJsonRpcResponse >> asJson [
 
 	| dict |
-	dict := Dictionary new.
-	dict at: 'jsonrpc' put: jsonrpc.
-	dict at: 'id' put: id.
+	dict := Dictionary
+		with: 'jsonrpc' -> jsonrpc
+		with: 'id' -> id.
 	error
 		ifNil: [ dict at: 'result' put: result ]
 		ifNotNil: [ dict at: 'error' put: error ].
