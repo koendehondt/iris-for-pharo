@@ -2,13 +2,13 @@ Class {
 	#name : 'IrisMCPJsonRpcResponse',
 	#superclass : 'Object',
 	#instVars : [
-		'jsonrpc',
 		'id',
 		'result',
 		'error'
 	],
-	#category : 'Iris',
-	#package : 'Iris'
+	#category : 'Iris-Server',
+	#package : 'Iris',
+	#tag : 'Server'
 }
 
 { #category : 'instance creation' }
@@ -37,7 +37,7 @@ IrisMCPJsonRpcResponse >> asJson [
 
 	| dict |
 	dict := Dictionary
-		with: 'jsonrpc' -> jsonrpc
+		with: 'jsonrpc' -> self jsonrpc
 		with: 'id' -> id.
 	error
 		ifNil: [ dict at: 'result' put: result ]
@@ -69,17 +69,10 @@ IrisMCPJsonRpcResponse >> id: anObject [
 	id := anObject
 ]
 
-{ #category : 'initialization' }
-IrisMCPJsonRpcResponse >> initialize [
-
-	super initialize.
-	jsonrpc := '2.0'
-]
-
 { #category : 'accessing' }
 IrisMCPJsonRpcResponse >> jsonrpc [
 
-	^ jsonrpc
+	^ '2.0'
 ]
 
 { #category : 'accessing' }

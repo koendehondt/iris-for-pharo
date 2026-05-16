@@ -1,8 +1,9 @@
 Class {
 	#name : 'IrisMCPGetMethodTool',
 	#superclass : 'IrisMCPTool',
-	#category : 'Iris',
-	#package : 'Iris'
+	#category : 'Iris-Tools',
+	#package : 'Iris',
+	#tag : 'Tools'
 }
 
 { #category : 'accessing' }
@@ -20,7 +21,7 @@ IrisMCPGetMethodTool >> execute: args [
 	classSide := args at: 'class_side' ifAbsent: [ false ].
 	className ifNil: [ ^ self errorResult: 'Missing required argument: class_name' ].
 	selector  ifNil: [ ^ self errorResult: 'Missing required argument: selector' ].
-	class := Smalltalk at: className asSymbol ifAbsent: [ nil ].
+	class := Smalltalk classNamed: className asSymbol.
 	class ifNil: [ ^ self errorResult: 'Class not found: ' , className ].
 	(class isKindOf: Class) ifFalse: [ ^ self errorResult: className , ' is not a class' ].
 	side := classSide ifTrue: [ class classSide ] ifFalse: [ class ].

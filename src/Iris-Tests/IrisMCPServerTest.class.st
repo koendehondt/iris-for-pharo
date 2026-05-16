@@ -12,9 +12,7 @@ Class {
 IrisMCPServerTest >> makePostRequest: aBody [
 
 	| req entity |
-	entity := ZnEntity
-		with: aBody
-		type: ZnMimeType applicationJson.
+	entity := ZnEntity with: aBody type: ZnMimeType applicationJson.
 	req := ZnRequest post: 'http://localhost:9999/mcp'.
 	req entity: entity.
 	^ req
@@ -24,6 +22,24 @@ IrisMCPServerTest >> makePostRequest: aBody [
 IrisMCPServerTest >> setUp [
 
 	server := IrisMCPServer new
+]
+
+{ #category : 'tests' }
+IrisMCPServerTest >> testCurrentIsNotNil [
+
+	self assert: IrisMCPServer current notNil
+]
+
+{ #category : 'tests' }
+IrisMCPServerTest >> testCurrentReturnsSameInstance [
+
+	self assert: IrisMCPServer current identicalTo: IrisMCPServer current
+]
+
+{ #category : 'tests' }
+IrisMCPServerTest >> testDefaultLoggerIsNoLogger [
+
+	self assert: server log isEmpty
 ]
 
 { #category : 'tests' }
@@ -66,6 +82,42 @@ IrisMCPServerTest >> testInvalidJsonReturnsParseError [
 ]
 
 { #category : 'tests' }
+IrisMCPServerTest >> testIsRunningFalseForNewServer [
+
+	self deny: server isRunning
+]
+
+{ #category : 'tests' }
+IrisMCPServerTest >> testLogEntryHasResponse [
+
+	| body |
+	body := NeoJSONWriter toString: (Dictionary
+		with: 'jsonrpc' -> '2.0'
+		with: 'id' -> 1
+		with: 'method' -> 'tools/list'
+		with: 'params' -> Dictionary new).
+	server startLogging.
+	server handleRequest: (self makePostRequest: body).
+	self assert: server log first response notNil
+]
+
+{ #category : 'tests' }
+IrisMCPServerTest >> testMultipleRequestsAreAllLogged [
+
+	| body |
+	body := NeoJSONWriter toString: (Dictionary
+		with: 'jsonrpc' -> '2.0'
+		with: 'id' -> 1
+		with: 'method' -> 'tools/list'
+		with: 'params' -> Dictionary new).
+	server startLogging.
+	server handleRequest: (self makePostRequest: body).
+	server handleRequest: (self makePostRequest: body).
+	self assert: server log size equals: 2.
+	self assert: (server log allSatisfy: [ :entry | entry isKindOf: IrisMCPLogEntry ])
+]
+
+{ #category : 'tests' }
 IrisMCPServerTest >> testNonPostReturns405 [
 
 	| req response |
@@ -87,6 +139,34 @@ IrisMCPServerTest >> testPortAccessor [
 
 	server port: 8080.
 	self assert: server port equals: 8080
+]
+
+{ #category : 'tests' }
+IrisMCPServerTest >> testRequestIsLoggedWhenLoggingEnabled [
+
+	| body |
+	body := NeoJSONWriter toString: (Dictionary
+		with: 'jsonrpc' -> '2.0'
+		with: 'id' -> 1
+		with: 'method' -> 'tools/list'
+		with: 'params' -> Dictionary new).
+	server startLogging.
+	server handleRequest: (self makePostRequest: body).
+	self assert: server log size equals: 1.
+	self assert: (server log first isKindOf: IrisMCPLogEntry)
+]
+
+{ #category : 'tests' }
+IrisMCPServerTest >> testRequestIsNotLoggedByDefault [
+
+	| body |
+	body := NeoJSONWriter toString: (Dictionary
+		with: 'jsonrpc' -> '2.0'
+		with: 'id' -> 1
+		with: 'method' -> 'tools/list'
+		with: 'params' -> Dictionary new).
+	server handleRequest: (self makePostRequest: body).
+	self assert: server log isEmpty
 ]
 
 { #category : 'tests' }
@@ -123,6 +203,36 @@ IrisMCPServerTest >> testResponseHasCorsHeader [
 		with: 'params' -> Dictionary new).
 	response := server handleRequest: (self makePostRequest: body).
 	self assert: (response headers at: 'Access-Control-Allow-Origin') equals: '*'
+]
+
+{ #category : 'tests' }
+IrisMCPServerTest >> testStartLoggingSwitchesToLogger [
+
+	| body |
+	body := NeoJSONWriter toString: (Dictionary
+		with: 'jsonrpc' -> '2.0'
+		with: 'id' -> 1
+		with: 'method' -> 'tools/list'
+		with: 'params' -> Dictionary new).
+	server startLogging.
+	server handleRequest: (self makePostRequest: body).
+	self deny: server log isEmpty
+]
+
+{ #category : 'tests' }
+IrisMCPServerTest >> testStopLoggingClearsLog [
+
+	server startLogging.
+	server stopLogging.
+	self assert: server log isEmpty
+]
+
+{ #category : 'tests' }
+IrisMCPServerTest >> testStopLoggingSwitchesToNoLogger [
+
+	server startLogging.
+	server stopLogging.
+	self assert: server log isEmpty
 ]
 
 { #category : 'tests' }

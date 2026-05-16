@@ -1,8 +1,9 @@
 Class {
 	#name : 'IrisMCPRunTestsTool',
 	#superclass : 'IrisMCPTool',
-	#category : 'Iris',
-	#package : 'Iris'
+	#category : 'Iris-Tools',
+	#package : 'Iris',
+	#tag : 'Tools'
 }
 
 { #category : 'accessing' }

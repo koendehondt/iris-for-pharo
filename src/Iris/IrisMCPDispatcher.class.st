@@ -4,8 +4,9 @@ Class {
 	#instVars : [
 		'registry'
 	],
-	#category : 'Iris',
-	#package : 'Iris'
+	#category : 'Iris-Server',
+	#package : 'Iris',
+	#tag : 'Server'
 }
 
 { #category : 'dispatching' }

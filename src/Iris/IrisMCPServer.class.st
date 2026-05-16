@@ -4,11 +4,38 @@ Class {
 	#instVars : [
 		'port',
 		'server',
-		'dispatcher'
+		'dispatcher',
+		'logger'
 	],
-	#category : 'Iris',
-	#package : 'Iris'
+	#classVars : [
+		'Current'
+	],
+	#category : 'Iris-Server',
+	#package : 'Iris',
+	#tag : 'Server'
 }
+
+{ #category : 'accessing' }
+IrisMCPServer class >> current [
+
+	^ Current
+]
+
+{ #category : 'accessing' }
+IrisMCPServer class >> current: aServer [
+
+	| wasRunning |
+	wasRunning := Current notNil and: [ Current isRunning ].
+	wasRunning ifTrue: [ Current stop ].
+	Current := aServer.
+	wasRunning ifTrue: [ Current start ]
+]
+
+{ #category : 'class initialization' }
+IrisMCPServer class >> initialize [
+
+	self current: self new
+]
 
 { #category : 'instance creation' }
 IrisMCPServer class >> onPort: anInteger [
@@ -52,7 +79,26 @@ IrisMCPServer >> initialize [
 	super initialize.
 	port := 9999.
 	dispatcher := IrisMCPDispatcher new.
-	dispatcher registerDefaultTools
+	dispatcher registerDefaultTools.
+	logger := IrisMCPNoLogger new
+]
+
+{ #category : 'testing' }
+IrisMCPServer >> isRunning [
+
+	^ server notNil and: [ server isRunning ]
+]
+
+{ #category : 'logging' }
+IrisMCPServer >> log [
+
+	^ logger log
+]
+
+{ #category : 'accessing' }
+IrisMCPServer >> logger [
+
+	^ logger
 ]
 
 { #category : 'responses' }
@@ -88,7 +134,7 @@ IrisMCPServer >> port: anInteger [
 { #category : 'request handling' }
 IrisMCPServer >> processJsonRpc: aZnRequest [
 
-	| body rpcRequest rpcResponse json |
+	| body rpcRequest rpcResponse json znResponse |
 	rpcResponse := [
 		body := aZnRequest entity ifNil: [ ^ self badRequestResponse: 'Empty body' ].
 		json := NeoJSONReader fromString: body string.
@@ -99,7 +145,9 @@ IrisMCPServer >> processJsonRpc: aZnRequest [
 			errorFor: nil
 			code: -32700
 			message: 'Parse error: ' , e messageText ].
-	^ self okResponseWith: rpcResponse asJson
+	znResponse := self okResponseWith: rpcResponse asJson.
+	logger logRequest: aZnRequest response: znResponse.
+	^ znResponse
 ]
 
 { #category : 'start/stop' }
@@ -110,10 +158,22 @@ IrisMCPServer >> start [
 	server start
 ]
 
+{ #category : 'logging' }
+IrisMCPServer >> startLogging [
+
+	logger := IrisMCPLogger new
+]
+
 { #category : 'start/stop' }
 IrisMCPServer >> stop [
 
 	server ifNotNil: [ server stop ]
+]
+
+{ #category : 'logging' }
+IrisMCPServer >> stopLogging [
+
+	logger := IrisMCPNoLogger new
 ]
 
 { #category : 'request handling' }

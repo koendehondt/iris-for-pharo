@@ -7,8 +7,9 @@ Class {
 		'method',
 		'params'
 	],
-	#category : 'Iris',
-	#package : 'Iris'
+	#category : 'Iris-Server',
+	#package : 'Iris',
+	#tag : 'Server'
 }
 
 { #category : 'instance creation' }

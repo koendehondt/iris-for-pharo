@@ -1,8 +1,9 @@
 Class {
 	#name : 'IrisMCPGetClassTool',
 	#superclass : 'IrisMCPTool',
-	#category : 'Iris',
-	#package : 'Iris'
+	#category : 'Iris-Tools',
+	#package : 'Iris',
+	#tag : 'Tools'
 }
 
 { #category : 'accessing' }
@@ -17,7 +18,7 @@ IrisMCPGetClassTool >> execute: args [
 	| className class stream |
 	className := args at: 'class_name' ifAbsent: [ nil ].
 	className ifNil: [ ^ self errorResult: 'Missing required argument: class_name' ].
-	class := Smalltalk at: className asSymbol ifAbsent: [ nil ].
+	class := Smalltalk classNamed: className asSymbol.
 	class ifNil: [ ^ self errorResult: 'Class not found: ' , className ].
 	(class isKindOf: Class) ifFalse: [ ^ self errorResult: className , ' is not a class' ].
 	stream := WriteStream on: String new.

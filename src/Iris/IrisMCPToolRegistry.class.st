@@ -4,8 +4,9 @@ Class {
 	#instVars : [
 		'tools'
 	],
-	#category : 'Iris',
-	#package : 'Iris'
+	#category : 'Iris-Server',
+	#package : 'Iris',
+	#tag : 'Server'
 }
 
 { #category : 'accessing' }
