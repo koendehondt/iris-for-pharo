@@ -35,10 +35,15 @@ IrisMCP class >> aboutText [
 { #category : 'actions' }
 IrisMCP class >> openServer [
 
-	IrisMCPServerPresenter allInstances
-		detect: [ :presenter | presenter window isOpen ]
-		ifFound: [ :presenter | presenter window activate ]
-		ifNone: [ IrisMCPServerPresenter new open ]
+	^ IrisMCPServerPresenter allInstances
+		detect: [ :presenter | presenter window ifNil: [ false ] ifNotNil: [ :window | window isOpen ] ]
+		ifFound: [ :presenter |
+			presenter window activate.
+			presenter ]
+		ifNone: [
+			IrisMCPServerPresenter new
+				open;
+				yourself ]
 ]
 
 { #category : 'accessing' }

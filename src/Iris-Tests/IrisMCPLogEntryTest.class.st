@@ -44,6 +44,18 @@ IrisMCPLogEntryTest >> testCancelledNotificationRequestArgument [
 ]
 
 { #category : 'tests' }
+IrisMCPLogEntryTest >> testDisplayToolName [
+
+	self assert: IrisMCPLogEntry new displayToolName equals: 'unknown'.
+	self assert: IrisMCPCancelledNotificationLogEntry new displayToolName equals: 'cancelled'.
+	self assert: IrisMCPEvalLogEntry new displayToolName equals: 'eval'.
+	self assert: IrisMCPGetClassLogEntry new displayToolName equals: 'get_class'.
+	self assert: IrisMCPGetMethodLogEntry new displayToolName equals: 'get_method'.
+	self assert: IrisMCPRunTestsLogEntry new displayToolName equals: 'run_tests'.
+	self assert: IrisMCPListClassesLogEntry new displayToolName equals: 'list_classes'
+]
+
+{ #category : 'tests' }
 IrisMCPLogEntryTest >> testEvalLogEntryPrintString [
 
 	| request entry |
@@ -111,6 +123,29 @@ IrisMCPLogEntryTest >> testGetMethodRequestArgument [
 		with: 'selector' -> 'x')).
 	entry := IrisMCPLogger new logEntryFor: request.
 	self assert: entry requestArgument equals: 'Point >> #x'
+]
+
+{ #category : 'tests' }
+IrisMCPLogEntryTest >> testListClassesLogEntryPrintString [
+
+	| request entry |
+	request := self requestFor: (self toolsCallBody: 'list_classes' arguments: (Dictionary
+		with: 'prefix' -> 'IrisMCP'
+		with: 'package' -> 'Iris')).
+	entry := IrisMCPLogger new logEntryFor: request.
+	self assert: (entry isKindOf: IrisMCPListClassesLogEntry).
+	self assert: entry printString equals: 'list_classes IrisMCP Iris'
+]
+
+{ #category : 'tests' }
+IrisMCPLogEntryTest >> testListClassesRequestArgument [
+
+	| request entry |
+	request := self requestFor: (self toolsCallBody: 'list_classes' arguments: (Dictionary
+		with: 'prefix' -> 'IrisMCP'
+		with: 'package' -> 'Iris')).
+	entry := IrisMCPLogger new logEntryFor: request.
+	self assert: entry requestArgument equals: 'IrisMCP Iris'
 ]
 
 { #category : 'tests' }

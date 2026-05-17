@@ -1,6 +1,6 @@
 Class {
 	#name : 'IrisMCPTest',
-	#superclass : 'TestCase',
+	#superclass : 'IrisMCPTestCase',
 	#category : 'Iris-Tests',
 	#package : 'Iris-Tests'
 }
@@ -22,6 +22,17 @@ It exposes Pharo tools to AI assistants such as Claude.
 Available tools: eval, get_class, get_method, list_classes, run_tests.
 
 (c) 2025 Koen De Hondt'))
+]
+
+{ #category : 'tests' }
+IrisMCPTest >> testOpenServer [
+
+	| presenter |
+	[
+		presenter := IrisMCP openServer.
+		self assert: presenter window isOpen
+	] ensure: [
+		presenter ifNotNil: [ presenter window close ] ]
 ]
 
 { #category : 'tests' }

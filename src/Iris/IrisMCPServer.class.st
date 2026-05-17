@@ -28,8 +28,7 @@ IrisMCPServer class >> current: aServer [
 	| wasRunning |
 	wasRunning := Current notNil and: [ Current isRunning ].
 	wasRunning ifTrue: [ Current stop ].
-	Current := aServer.
-	wasRunning ifTrue: [ Current start ]
+	Current := aServer
 ]
 
 { #category : 'class initialization' }
@@ -106,12 +105,6 @@ IrisMCPServer >> isRunning [
 IrisMCPServer >> log [
 
 	^ logger log
-]
-
-{ #category : 'accessing' }
-IrisMCPServer >> logger [
-
-	^ logger
 ]
 
 { #category : 'responses' }
@@ -191,7 +184,7 @@ IrisMCPServer >> stopLogging [
 
 { #category : 'request handling' }
 IrisMCPServer >> value: aZnRequest [
-
 	"Zinc delegate protocol - called for every incoming request."
+
 	^ self handleRequest: aZnRequest
 ]

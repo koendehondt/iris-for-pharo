@@ -61,7 +61,7 @@ IrisMCPServerPresenter >> initializePresenters [
 	loggingButton := self newButton.
 	logList := self newTable.
 	logList
-		addColumn: (((SpStringTableColumn title: 'Tool' evaluated: [ :entry | entry toolName ]) width: 80) displayBold: [ :entry | true ]);
+		addColumn: (((SpStringTableColumn title: 'Tool' evaluated: [ :entry | entry displayToolName ]) width: 80) displayBold: [ :entry | true ]);
 		addColumn: (SpStringTableColumn title: 'Argument' evaluated: [ :entry | entry requestArgument ]);
 		items: self server log.
 	logEntryPresenter := self instantiate: IrisMCPLogEntryPresenter.
@@ -79,6 +79,12 @@ IrisMCPServerPresenter >> initializeWindow: aWindowPresenter [
 	aWindowPresenter whenOpenedDo: [ self refreshLog ]
 ]
 
+{ #category : 'test api' }
+IrisMCPServerPresenter >> loggingButtonLabel [
+
+	^ loggingButton label
+]
+
 { #category : 'actions' }
 IrisMCPServerPresenter >> refreshLog [
 
@@ -90,6 +96,12 @@ IrisMCPServerPresenter >> refreshLog [
 IrisMCPServerPresenter >> server [
 
 	^ IrisMCPServer current
+]
+
+{ #category : 'test api' }
+IrisMCPServerPresenter >> serverButtonLabel [
+
+	^ serverButton label
 ]
 
 { #category : 'actions' }

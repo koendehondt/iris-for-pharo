@@ -37,6 +37,19 @@ IrisMCPServerTest >> testAnnouncerReturnsSameInstance [
 ]
 
 { #category : 'tests' }
+IrisMCPServerTest >> testClassInitializationSetsNewCurrentServer [
+
+	self restoreCurrentServerAfter: [ :oldServer | | newServer |
+		IrisMCPServer initialize.
+		newServer := IrisMCPServer current.
+		self assert: IrisMCPServer current identicalTo: newServer.
+		self deny: oldServer isRunning.
+		self assert: oldServer isLogging.
+		self deny: newServer isRunning.
+		self deny: newServer isLogging ]
+]
+
+{ #category : 'tests' }
 IrisMCPServerTest >> testCurrentIsNotNil [
 
 	self assert: IrisMCPServer current notNil
@@ -112,12 +125,6 @@ IrisMCPServerTest >> testIsLoggingTrueAfterStartLogging [
 
 	server startLogging.
 	self assert: server isLogging
-]
-
-{ #category : 'tests' }
-IrisMCPServerTest >> testIsRunningFalseForNewServer [
-
-	self deny: server isRunning
 ]
 
 { #category : 'tests' }
@@ -270,6 +277,19 @@ IrisMCPServerTest >> testResponseHasCorsHeader [
 ]
 
 { #category : 'tests' }
+IrisMCPServerTest >> testSetCurrent [
+
+	self restoreCurrentServerAfter: [ :oldServer | | newServer |
+		newServer := IrisMCPServer onPort: 7777.
+		IrisMCPServer current: newServer.
+		self assert: IrisMCPServer current identicalTo: newServer.
+		self deny: oldServer isRunning.
+		self assert: oldServer isLogging.
+		self deny: newServer isRunning.
+		self deny: newServer isLogging ]
+]
+
+{ #category : 'tests' }
 IrisMCPServerTest >> testStartLoggingSwitchesToLogger [
 
 	| body |
@@ -281,6 +301,17 @@ IrisMCPServerTest >> testStartLoggingSwitchesToLogger [
 	server startLogging.
 	server handleRequest: (self makePostRequest: body).
 	self deny: server log isEmpty
+]
+
+{ #category : 'tests' }
+IrisMCPServerTest >> testStartingAndStopping [
+
+	server port: 8080.
+	self deny: server isRunning.
+	server start.
+	self assert: server isRunning.
+	server stop.
+	self deny: server isRunning
 ]
 
 { #category : 'tests' }
