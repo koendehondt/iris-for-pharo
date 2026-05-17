@@ -40,20 +40,56 @@ Metacello new
     load
 ```
 
-## Start the server
+## Starting and stopping the server by hand
 
 ```smalltalk
-server := IrisMCPServer new.
-server start
+"IrisMCPServer implements the Singleton design pattern."
+IrisMCPServer current.
+
+"Starting the server."
+IrisMCPServer current start.
+
+"Checkng whether the server is running."
+IrisMCPServer current isRunning.
+
+"Stopping the server."
+IrisMCPServer current stop
 ```
 
-By default, the server runs on port 9999. To run on a custom port, 8888 for instance, evaluate `(IrisMCPServer onPort: 8888) start`.
-
-## Stop the server
+By default, the server runs on port 9999. To run on a custom port, 8888 for instance, evaluate
 
 ```smalltalk
-server stop
+IrisMCPServer current stop.
+IrisMCPServer current: (IrisMCPServer onPort: 8888).
+IrisMCPServer current start
 ```
+
+## Starting and stopping logging by hand
+
+The server keeps a log of the incoming requests and the corresponding responses. Logging can be turned on and off.
+
+```smalltalk
+"Start logging."
+IrisMCPServer current startLogging.
+
+"Checkng whether the server is logging."
+IrisMCPServer current isLogging.
+
+"Stop logging."
+IrisMCPServer current stopLogging.
+```
+
+## Managing the server
+
+The Pharo menubar includes an `Iris` menu, with a command to open the Iris MCP Server.
+
+![Iris in the Pharo menubar](/doc/iris_in_pharo_menubar.png)
+
+The window is a kind of console to start and stop the server, to start and stop logging, and to browse the log.
+
+![The Iris MCP Server window](/doc/iris_mcp_server_window.png)
+
+
 
 ## Claude Desktop Configuration
 
