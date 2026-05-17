@@ -25,6 +25,18 @@ IrisMCPServerTest >> setUp [
 ]
 
 { #category : 'tests' }
+IrisMCPServerTest >> testAnnouncerIsNotNil [
+
+	self assert: server announcer notNil
+]
+
+{ #category : 'tests' }
+IrisMCPServerTest >> testAnnouncerReturnsSameInstance [
+
+	self assert: server announcer identicalTo: server announcer
+]
+
+{ #category : 'tests' }
 IrisMCPServerTest >> testCurrentIsNotNil [
 
 	self assert: IrisMCPServer current notNil
@@ -79,6 +91,27 @@ IrisMCPServerTest >> testInvalidJsonReturnsParseError [
 		with: 'error' -> (Dictionary
 			with: 'code' -> -32700
 			with: 'message' -> 'Parse error: invalid input: n'))
+]
+
+{ #category : 'tests' }
+IrisMCPServerTest >> testIsLoggingFalseAfterStopLogging [
+
+	server startLogging.
+	server stopLogging.
+	self deny: server isLogging
+]
+
+{ #category : 'tests' }
+IrisMCPServerTest >> testIsLoggingFalseByDefault [
+
+	self deny: server isLogging
+]
+
+{ #category : 'tests' }
+IrisMCPServerTest >> testIsLoggingTrueAfterStartLogging [
+
+	server startLogging.
+	self assert: server isLogging
 ]
 
 { #category : 'tests' }
@@ -167,6 +200,37 @@ IrisMCPServerTest >> testRequestIsNotLoggedByDefault [
 		with: 'params' -> Dictionary new).
 	server handleRequest: (self makePostRequest: body).
 	self assert: server log isEmpty
+]
+
+{ #category : 'tests' }
+IrisMCPServerTest >> testRequestLoggedAnnouncementFiredWhenLogging [
+
+	| body announced |
+	body := NeoJSONWriter toString: (Dictionary
+		with: 'jsonrpc' -> '2.0'
+		with: 'id' -> 1
+		with: 'method' -> 'tools/list'
+		with: 'params' -> Dictionary new).
+	announced := false.
+	server startLogging.
+	server announcer when: IrisMCPRequestLogged do: [ :ann | announced := true ] for: self.
+	server handleRequest: (self makePostRequest: body).
+	self assert: announced
+]
+
+{ #category : 'tests' }
+IrisMCPServerTest >> testRequestLoggedAnnouncementNotFiredWhenNotLogging [
+
+	| body announced |
+	body := NeoJSONWriter toString: (Dictionary
+		with: 'jsonrpc' -> '2.0'
+		with: 'id' -> 1
+		with: 'method' -> 'tools/list'
+		with: 'params' -> Dictionary new).
+	announced := false.
+	server announcer when: IrisMCPRequestLogged do: [ :ann | announced := true ] for: self.
+	server handleRequest: (self makePostRequest: body).
+	self deny: announced
 ]
 
 { #category : 'tests' }

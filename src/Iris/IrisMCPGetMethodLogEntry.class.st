@@ -13,13 +13,21 @@ IrisMCPGetMethodLogEntry class >> toolName [
 ]
 
 { #category : 'printing' }
-IrisMCPGetMethodLogEntry >> printOn: aStream [
+IrisMCPGetMethodLogEntry >> printArgumentOn: aStream [
 
-	super printOn: aStream.
 	aStream
 		space;
 		nextPut: $#;
 		nextPutAll: self selector
+]
+
+{ #category : 'accessing' }
+IrisMCPGetMethodLogEntry >> requestArgument [
+
+	| json arguments |
+	json := NeoJSONReader fromString: request entity string.
+	arguments := (json at: 'params') at: 'arguments'.
+	^ (arguments at: 'class_name') , ' >> #' , (arguments at: 'selector' ifAbsent: [ '?' ])
 ]
 
 { #category : 'accessing' }

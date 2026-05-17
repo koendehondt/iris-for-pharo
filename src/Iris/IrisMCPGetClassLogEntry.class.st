@@ -13,13 +13,18 @@ IrisMCPGetClassLogEntry class >> toolName [
 ]
 
 { #category : 'printing' }
-IrisMCPGetClassLogEntry >> printOn: aStream [
+IrisMCPGetClassLogEntry >> printArgumentOn: aStream [
 
 	| json className |
 	json := NeoJSONReader fromString: request entity string.
 	className := ((json at: 'params') at: 'arguments') at: 'class_name'.
-	super printOn: aStream.
-	aStream
-		space;
-		nextPutAll: className
+	aStream space; nextPutAll: className
+]
+
+{ #category : 'accessing' }
+IrisMCPGetClassLogEntry >> requestArgument [
+
+	| json |
+	json := NeoJSONReader fromString: request entity string.
+	^ ((json at: 'params') at: 'arguments') at: 'class_name'
 ]

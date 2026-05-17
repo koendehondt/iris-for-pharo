@@ -26,10 +26,13 @@ IrisMCPEvalLogEntry >> expression [
 ]
 
 { #category : 'printing' }
-IrisMCPEvalLogEntry >> printOn: aStream [
+IrisMCPEvalLogEntry >> printArgumentOn: aStream [
 
-	super printOn: aStream.
-	aStream
-		space;
-		nextPutAll: self expression
+	aStream space; nextPutAll: self expression
+]
+
+{ #category : 'accessing' }
+IrisMCPEvalLogEntry >> requestArgument [
+
+	^ self expression
 ]

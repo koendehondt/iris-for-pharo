@@ -6,6 +6,12 @@ Class {
 	#tag : 'Logging'
 }
 
+{ #category : 'testing' }
+IrisMCPNoLogger >> isLogging [
+
+	^ false
+]
+
 { #category : 'accessing' }
 IrisMCPNoLogger >> log [
 
@@ -13,7 +19,7 @@ IrisMCPNoLogger >> log [
 ]
 
 { #category : 'logging' }
-IrisMCPNoLogger >> logRequest: aRequest response: aResponse [
+IrisMCPNoLogger >> logRequest: aRequest response: aResponse announceTo: anAnnouncer [
 
 	"Do nothing."
 ]

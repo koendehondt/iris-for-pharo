@@ -5,7 +5,8 @@ Class {
 		'port',
 		'server',
 		'dispatcher',
-		'logger'
+		'logger',
+		'announcer'
 	],
 	#classVars : [
 		'Current'
@@ -45,6 +46,12 @@ IrisMCPServer class >> onPort: anInteger [
 		yourself
 ]
 
+{ #category : 'accessing' }
+IrisMCPServer >> announcer [
+
+	^ announcer ifNil: [ announcer := Announcer new ]
+]
+
 { #category : 'responses' }
 IrisMCPServer >> badRequestResponse: aMessage [
 
@@ -81,6 +88,12 @@ IrisMCPServer >> initialize [
 	dispatcher := IrisMCPDispatcher new.
 	dispatcher registerDefaultTools.
 	logger := IrisMCPNoLogger new
+]
+
+{ #category : 'testing' }
+IrisMCPServer >> isLogging [
+
+	^ logger isLogging
 ]
 
 { #category : 'testing' }
@@ -146,7 +159,7 @@ IrisMCPServer >> processJsonRpc: aZnRequest [
 			code: -32700
 			message: 'Parse error: ' , e messageText ].
 	znResponse := self okResponseWith: rpcResponse asJson.
-	logger logRequest: aZnRequest response: znResponse.
+	logger logRequest: aZnRequest response: znResponse announceTo: self announcer.
 	^ znResponse
 ]
 

@@ -31,6 +31,19 @@ IrisMCPLogEntryTest >> testCancelledNotificationLogEntryPrintString [
 ]
 
 { #category : 'tests' }
+IrisMCPLogEntryTest >> testCancelledNotificationRequestArgument [
+
+	| body request entry |
+	body := NeoJSONWriter toString: (Dictionary
+		with: 'jsonrpc' -> '2.0'
+		with: 'method' -> 'notifications/cancelled'
+		with: 'params' -> (Dictionary with: 'requestId' -> 1 with: 'reason' -> 'timeout')).
+	request := self requestFor: body.
+	entry := IrisMCPLogger new logEntryFor: request.
+	self assert: entry requestArgument equals: 'timeout'
+]
+
+{ #category : 'tests' }
 IrisMCPLogEntryTest >> testEvalLogEntryPrintString [
 
 	| request entry |
@@ -50,6 +63,15 @@ IrisMCPLogEntryTest >> testEvalLogEntryStripsNewlines [
 ]
 
 { #category : 'tests' }
+IrisMCPLogEntryTest >> testEvalRequestArgument [
+
+	| request entry |
+	request := self requestFor: (self toolsCallBody: 'eval' arguments: (Dictionary with: 'expression' -> '1 + 1')).
+	entry := IrisMCPLogger new logEntryFor: request.
+	self assert: entry requestArgument equals: '1 + 1'
+]
+
+{ #category : 'tests' }
 IrisMCPLogEntryTest >> testGetClassLogEntryPrintString [
 
 	| request entry |
@@ -57,6 +79,15 @@ IrisMCPLogEntryTest >> testGetClassLogEntryPrintString [
 	entry := IrisMCPLogger new logEntryFor: request.
 	self assert: (entry isKindOf: IrisMCPGetClassLogEntry).
 	self assert: entry printString equals: 'get_class Point'
+]
+
+{ #category : 'tests' }
+IrisMCPLogEntryTest >> testGetClassRequestArgument [
+
+	| request entry |
+	request := self requestFor: (self toolsCallBody: 'get_class' arguments: (Dictionary with: 'class_name' -> 'Point')).
+	entry := IrisMCPLogger new logEntryFor: request.
+	self assert: entry requestArgument equals: 'Point'
 ]
 
 { #category : 'tests' }
@@ -69,6 +100,17 @@ IrisMCPLogEntryTest >> testGetMethodLogEntryPrintString [
 	entry := IrisMCPLogger new logEntryFor: request.
 	self assert: (entry isKindOf: IrisMCPGetMethodLogEntry).
 	self assert: entry printString equals: 'get_method #x'
+]
+
+{ #category : 'tests' }
+IrisMCPLogEntryTest >> testGetMethodRequestArgument [
+
+	| request entry |
+	request := self requestFor: (self toolsCallBody: 'get_method' arguments: (Dictionary
+		with: 'class_name' -> 'Point'
+		with: 'selector' -> 'x')).
+	entry := IrisMCPLogger new logEntryFor: request.
+	self assert: entry requestArgument equals: 'Point >> #x'
 ]
 
 { #category : 'tests' }
@@ -90,6 +132,15 @@ IrisMCPLogEntryTest >> testRunTestsLogEntryWithPackage [
 	entry := IrisMCPLogger new logEntryFor: request.
 	self assert: (entry isKindOf: IrisMCPRunTestsLogEntry).
 	self assert: entry printString equals: 'run_tests Iris-Tests'
+]
+
+{ #category : 'tests' }
+IrisMCPLogEntryTest >> testRunTestsRequestArgument [
+
+	| request entry |
+	request := self requestFor: (self toolsCallBody: 'run_tests' arguments: (Dictionary with: 'package' -> 'Iris-Tests')).
+	entry := IrisMCPLogger new logEntryFor: request.
+	self assert: entry requestArgument equals: 'Iris-Tests'
 ]
 
 { #category : 'tests' }

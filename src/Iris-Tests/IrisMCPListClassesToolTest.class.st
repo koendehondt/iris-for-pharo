@@ -12,7 +12,8 @@ IrisMCPListClassesToolTest >> testFiltersByPackage [
 	result := self tool execute: (Dictionary with: 'package' -> 'Iris').
 	self assert: result equals: (Dictionary
 		with: 'content' -> { Dictionary
-			with: 'text' -> 'IrisMCPCancelledNotificationLogEntry (Iris)
+			with: 'text' -> 'IrisMCP (Iris)
+IrisMCPCancelledNotificationLogEntry (Iris)
 IrisMCPDispatcher (Iris)
 IrisMCPEvalLogEntry (Iris)
 IrisMCPEvalTool (Iris)
@@ -24,13 +25,18 @@ IrisMCPJsonRpcRequest (Iris)
 IrisMCPJsonRpcResponse (Iris)
 IrisMCPListClassesTool (Iris)
 IrisMCPLogEntry (Iris)
+IrisMCPLogEntryPresenter (Iris)
 IrisMCPLogger (Iris)
+IrisMCPMenus (Iris)
 IrisMCPNoLogger (Iris)
+IrisMCPRequestLogged (Iris)
 IrisMCPRunTestsLogEntry (Iris)
 IrisMCPRunTestsTool (Iris)
 IrisMCPServer (Iris)
+IrisMCPServerPresenter (Iris)
 IrisMCPTool (Iris)
 IrisMCPToolRegistry (Iris)
+IrisMCPVersion (Iris)
 IrisTestResult (Iris)
 '
 			with: 'type' -> 'text' })
@@ -40,15 +46,50 @@ IrisTestResult (Iris)
 IrisMCPListClassesToolTest >> testFiltersByPrefix [
 
 	| result |
-	result := self tool execute: (Dictionary with: 'prefix' -> 'IrisMCPT').
+	result := self tool execute: (Dictionary with: 'prefix' -> 'IrisMCP').
 	self assert: result equals: (Dictionary
 		with: 'content' -> { Dictionary
-			with: 'type' -> 'text'
-			with: 'text' -> 'IrisMCPTestCase (Iris-Tests)
+			with: 'text' -> 'IrisMCP (Iris)
+IrisMCPCancelledNotificationLogEntry (Iris)
+IrisMCPDispatcher (Iris)
+IrisMCPDispatcherTest (Iris-Tests)
+IrisMCPEvalLogEntry (Iris)
+IrisMCPEvalTool (Iris)
+IrisMCPEvalToolTest (Iris-Tests)
+IrisMCPGetClassLogEntry (Iris)
+IrisMCPGetClassTool (Iris)
+IrisMCPGetClassToolTest (Iris-Tests)
+IrisMCPGetMethodLogEntry (Iris)
+IrisMCPGetMethodTool (Iris)
+IrisMCPGetMethodToolTest (Iris-Tests)
+IrisMCPJsonRpcRequest (Iris)
+IrisMCPJsonRpcRequestTest (Iris-Tests)
+IrisMCPJsonRpcResponse (Iris)
+IrisMCPJsonRpcResponseTest (Iris-Tests)
+IrisMCPListClassesTool (Iris)
+IrisMCPListClassesToolTest (Iris-Tests)
+IrisMCPLogEntry (Iris)
+IrisMCPLogEntryPresenter (Iris)
+IrisMCPLogEntryTest (Iris-Tests)
+IrisMCPLogger (Iris)
+IrisMCPMenus (Iris)
+IrisMCPNoLogger (Iris)
+IrisMCPRequestLogged (Iris)
+IrisMCPRunTestsLogEntry (Iris)
+IrisMCPRunTestsTool (Iris)
+IrisMCPRunTestsToolTest (Iris-Tests)
+IrisMCPServer (Iris)
+IrisMCPServerPresenter (Iris)
+IrisMCPServerTest (Iris-Tests)
+IrisMCPTest (Iris-Tests)
+IrisMCPTestCase (Iris-Tests)
 IrisMCPTool (Iris)
 IrisMCPToolRegistry (Iris)
 IrisMCPToolRegistryTest (Iris-Tests)
-' })
+IrisMCPVersion (Iris)
+IrisMCPVersionTest (Iris-Tests)
+'
+			with: 'type' -> 'text' })
 ]
 
 { #category : 'tests' }
@@ -60,7 +101,8 @@ IrisMCPListClassesToolTest >> testFiltersByPrefixAndPackage [
 		with: 'package' -> 'Iris').
 	self assert: result equals: (Dictionary
 		with: 'content' -> { Dictionary
-			with: 'text' -> 'IrisMCPCancelledNotificationLogEntry (Iris)
+			with: 'text' -> 'IrisMCP (Iris)
+IrisMCPCancelledNotificationLogEntry (Iris)
 IrisMCPDispatcher (Iris)
 IrisMCPEvalLogEntry (Iris)
 IrisMCPEvalTool (Iris)
@@ -72,13 +114,18 @@ IrisMCPJsonRpcRequest (Iris)
 IrisMCPJsonRpcResponse (Iris)
 IrisMCPListClassesTool (Iris)
 IrisMCPLogEntry (Iris)
+IrisMCPLogEntryPresenter (Iris)
 IrisMCPLogger (Iris)
+IrisMCPMenus (Iris)
 IrisMCPNoLogger (Iris)
+IrisMCPRequestLogged (Iris)
 IrisMCPRunTestsLogEntry (Iris)
 IrisMCPRunTestsTool (Iris)
 IrisMCPServer (Iris)
+IrisMCPServerPresenter (Iris)
 IrisMCPTool (Iris)
 IrisMCPToolRegistry (Iris)
+IrisMCPVersion (Iris)
 '
 			with: 'type' -> 'text' })
 ]

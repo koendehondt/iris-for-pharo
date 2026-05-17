@@ -16,6 +16,12 @@ IrisMCPLogger >> initialize [
 	log := OrderedCollection new
 ]
 
+{ #category : 'testing' }
+IrisMCPLogger >> isLogging [
+
+	^ true
+]
+
 { #category : 'accessing' }
 IrisMCPLogger >> log [
 
@@ -36,12 +42,13 @@ IrisMCPLogger >> logEntryFor: aRequest [
 ]
 
 { #category : 'logging' }
-IrisMCPLogger >> logRequest: aRequest response: aResponse [
+IrisMCPLogger >> logRequest: aRequest response: aResponse announceTo: anAnnouncer [
 
 	| entry |
 	entry := self logEntryFor: aRequest.
 	entry response: aResponse.
-	log add: entry
+	log add: entry.
+	anAnnouncer announce: IrisMCPRequestLogged new
 ]
 
 { #category : 'private' }

@@ -13,16 +13,24 @@ IrisMCPRunTestsLogEntry class >> toolName [
 ]
 
 { #category : 'printing' }
-IrisMCPRunTestsLogEntry >> printOn: aStream [
+IrisMCPRunTestsLogEntry >> printArgumentOn: aStream [
 
 	| json arguments |
 	json := NeoJSONReader fromString: request entity string.
 	arguments := (json at: 'params') at: 'arguments'.
-	super printOn: aStream.
-	(arguments at: 'package' ifAbsent: [ nil ]) ifNotNil: [ :pkg |
-		aStream space; nextPutAll: pkg ].
-	(arguments at: 'class_name' ifAbsent: [ nil ]) ifNotNil: [ :cls |
-		aStream space; nextPutAll: cls ].
-	(arguments at: 'selector' ifAbsent: [ nil ]) ifNotNil: [ :sel |
-		aStream space; nextPut: $#; nextPutAll: sel ]
+	arguments at: 'package' ifPresent: [ :pkg | aStream space; nextPutAll: pkg ].
+	arguments at: 'class_name' ifPresent: [ :cls | aStream space; nextPutAll: cls ].
+	arguments at: 'selector' ifPresent: [ :sel | aStream space; nextPut: $#; nextPutAll: sel ]
+]
+
+{ #category : 'accessing' }
+IrisMCPRunTestsLogEntry >> requestArgument [
+
+	| json arguments |
+	json := NeoJSONReader fromString: request entity string.
+	arguments := (json at: 'params') at: 'arguments'.
+	^ String streamContents: [ :result |
+		arguments at: 'package' ifPresent: [ :pkg | result nextPutAll: pkg ].
+		arguments at: 'class_name' ifPresent: [ :cls | result nextPutAll: cls ].
+		arguments at: 'selector' ifPresent: [ :sel | result nextPutAll: ' >> #'; nextPutAll: sel ] ]
 ]
