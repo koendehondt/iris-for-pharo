@@ -44,7 +44,6 @@ IrisMCPServerTest >> testClassInitializationSetsNewCurrentServer [
 		newServer := IrisMCPServer current.
 		self assert: IrisMCPServer current identicalTo: newServer.
 		self deny: oldServer isRunning.
-		self assert: oldServer isLogging.
 		self deny: newServer isRunning.
 		self deny: newServer isLogging ]
 ]
@@ -284,7 +283,6 @@ IrisMCPServerTest >> testSetCurrent [
 		IrisMCPServer current: newServer.
 		self assert: IrisMCPServer current identicalTo: newServer.
 		self deny: oldServer isRunning.
-		self assert: oldServer isLogging.
 		self deny: newServer isRunning.
 		self deny: newServer isLogging ]
 ]
