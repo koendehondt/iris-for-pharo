@@ -4,7 +4,9 @@
 
 # Iris
 
-A [Model Context Protocol](https://modelcontextprotocol.io) (MCP) server running inside a live [Pharo](https://pharo.org) image.
+Iris is a [Model Context Protocol](https://modelcontextprotocol.io) (MCP) server running inside a live [Pharo](https://pharo.org) image.
+
+It was developed with [Claude AI](https://claude.com/product/overview) in several pair programming sessions.
 
 It allows Claude Desktop (or any MCP client) to inspect and interact with a running Pharo image.
 
@@ -86,6 +88,7 @@ The Pharo menubar includes an `Iris` menu, with a command to open the Iris MCP S
 ![Iris in the Pharo menubar](/doc/iris_in_pharo_menubar.png)
 
 The window is a kind of console to start and stop the server, to start and stop logging, and to browse the log.
+Browsing the log is handy to keep an eye on what the agent is doing inside the Pharo image.
 
 ![The Iris MCP Server window](/doc/iris_mcp_server_window.png)
 
