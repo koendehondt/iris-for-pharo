@@ -161,25 +161,29 @@ IrisMCPServer >> start [
 
 	server := ZnServer on: port.
 	server onRequestRespond: [ :request | self handleRequest: request ].
-	server start
+	server start.
+	self announcer announce: (IrisMCPServerStarted on: self)
 ]
 
 { #category : 'logging' }
 IrisMCPServer >> startLogging [
 
-	logger := IrisMCPLogger new
+	logger := IrisMCPLogger new.
+	self announcer announce: (IrisMCPLoggingStarted on: self)
 ]
 
 { #category : 'start/stop' }
 IrisMCPServer >> stop [
 
-	server ifNotNil: [ server stop ]
+	server ifNotNil: [ server stop ].
+	self announcer announce: (IrisMCPServerStopped on: self)
 ]
 
 { #category : 'logging' }
 IrisMCPServer >> stopLogging [
 
-	logger := IrisMCPNoLogger new
+	logger := IrisMCPNoLogger new.
+	self announcer announce: (IrisMCPLoggingStopped on: self)
 ]
 
 { #category : 'request handling' }

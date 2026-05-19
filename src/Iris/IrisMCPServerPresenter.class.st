@@ -64,9 +64,7 @@ IrisMCPServerPresenter >> initializePresenters [
 		addColumn: (((SpStringTableColumn title: 'Tool' evaluated: [ :entry | entry displayToolName ]) width: 80) displayBold: [ :entry | true ]);
 		addColumn: (SpStringTableColumn title: 'Argument' evaluated: [ :entry | entry requestArgument ]);
 		items: self server log.
-	logEntryPresenter := self instantiate: IrisMCPLogEntryPresenter.
-	self updateButtons.
-	self subscribeToAnnouncements
+	logEntryPresenter := self instantiate: IrisMCPLogEntryPresenter
 ]
 
 { #category : 'initialization' }
@@ -75,8 +73,14 @@ IrisMCPServerPresenter >> initializeWindow: aWindowPresenter [
 	super initializeWindow: aWindowPresenter.
 	aWindowPresenter title: self class defaultTitle.
 	aWindowPresenter aboutText: IrisMCP about.
-	self updateTitle.
-	aWindowPresenter whenOpenedDo: [ self refreshLog ]
+	aWindowPresenter whenOpenedDo: [
+		self updateServerButton.
+		self updateLoggingButton.
+		self refreshLog.
+		self updateTitle.
+		self subscribeToAnnouncements ].
+	aWindowPresenter whenClosedDo: [
+		self unsubscribeFromAnnouncements ]
 ]
 
 { #category : 'test api' }
@@ -107,40 +111,36 @@ IrisMCPServerPresenter >> serverButtonLabel [
 { #category : 'actions' }
 IrisMCPServerPresenter >> startLogging [
 
-	self server startLogging.
-	self updateButtons
+	self server startLogging
 ]
 
 { #category : 'actions' }
 IrisMCPServerPresenter >> startServer [
 
-	self server start.
-	self updateButtons.
-	self updateTitle
+	self server start
 ]
 
 { #category : 'actions' }
 IrisMCPServerPresenter >> stopLogging [
 
-	self server stopLogging.
-	self updateButtons
+	self server stopLogging
 ]
 
 { #category : 'actions' }
 IrisMCPServerPresenter >> stopServer [
 
-	self server stop.
-	self updateButtons.
-	self updateTitle
+	self server stop
 ]
 
 { #category : 'announcements' }
 IrisMCPServerPresenter >> subscribeToAnnouncements [
 
 	self server announcer
-		when: IrisMCPRequestLogged
-		do: [ :ann | self refreshLog ]
-		for: self
+		when: IrisMCPRequestLogged do: [ :ann | self refreshLog ] for: self;
+		when: IrisMCPServerStarted do: [ :ann | ann server == self server ifTrue: [ self updateServerButton; updateTitle ] ] for: self;
+		when: IrisMCPServerStopped do: [ :ann | ann server == self server ifTrue: [ self updateServerButton; updateTitle ] ] for: self;
+		when: IrisMCPLoggingStarted do: [ :ann | ann server == self server ifTrue: [ self updateLoggingButton ] ] for: self;
+		when: IrisMCPLoggingStopped do: [ :ann | ann server == self server ifTrue: [ self updateLoggingButton ] ] for: self
 ]
 
 { #category : 'announcements' }
@@ -150,17 +150,8 @@ IrisMCPServerPresenter >> unsubscribeFromAnnouncements [
 ]
 
 { #category : 'actions' }
-IrisMCPServerPresenter >> updateButtons [
+IrisMCPServerPresenter >> updateLoggingButton [
 
-	self server isRunning
-		ifTrue: [
-			serverButton
-				label: 'Stop server';
-				action: [ self stopServer ] ]
-		ifFalse: [
-			serverButton
-				label: 'Start server';
-				action: [ self startServer ] ].
 	self server isLogging
 		ifTrue: [
 			loggingButton
@@ -172,12 +163,27 @@ IrisMCPServerPresenter >> updateButtons [
 				action: [ self startLogging ] ]
 ]
 
+{ #category : 'actions' }
+IrisMCPServerPresenter >> updateServerButton [
+
+	self server isRunning
+		ifTrue: [
+			serverButton
+				label: 'Stop server';
+				action: [ self stopServer ] ]
+		ifFalse: [
+			serverButton
+				label: 'Start server';
+				action: [ self startServer ] ]
+]
+
 { #category : 'accessing' }
 IrisMCPServerPresenter >> updateTitle [
 
-	| subtitle |
-	subtitle := self server isRunning
-		ifTrue: [ 'running on port ' , self server port printString ]
-		ifFalse: [ 'not running' ].
-	self window title: self class defaultTitle , ' (' , subtitle , ')'
+	self withWindowDo: [ :window |
+		| subtitle |
+		subtitle := self server isRunning
+			ifTrue: [ 'running on port ' , self server port printString ]
+			ifFalse: [ 'not running' ].
+		window title: self class defaultTitle , ' (' , subtitle , ')' ]
 ]

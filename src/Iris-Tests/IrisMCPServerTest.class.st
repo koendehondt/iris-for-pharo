@@ -141,6 +141,27 @@ IrisMCPServerTest >> testLogEntryHasResponse [
 ]
 
 { #category : 'tests' }
+IrisMCPServerTest >> testLoggingStartedAnnouncementCarriesServer [
+
+	| announcedServer |
+	announcedServer := nil.
+	server announcer when: IrisMCPLoggingStarted do: [ :ann | announcedServer := ann server ] for: self.
+	server startLogging.
+	self assert: announcedServer identicalTo: server
+]
+
+{ #category : 'tests' }
+IrisMCPServerTest >> testLoggingStoppedAnnouncementCarriesServer [
+
+	| announcedServer |
+	announcedServer := nil.
+	server announcer when: IrisMCPLoggingStopped do: [ :ann | announcedServer := ann server ] for: self.
+	server startLogging.
+	server stopLogging.
+	self assert: announcedServer identicalTo: server
+]
+
+{ #category : 'tests' }
 IrisMCPServerTest >> testMultipleRequestsAreAllLogged [
 
 	| body |
@@ -273,6 +294,30 @@ IrisMCPServerTest >> testResponseHasCorsHeader [
 		with: 'params' -> Dictionary new).
 	response := server handleRequest: (self makePostRequest: body).
 	self assert: (response headers at: 'Access-Control-Allow-Origin') equals: '*'
+]
+
+{ #category : 'tests' }
+IrisMCPServerTest >> testServerStartedAnnouncementCarriesServer [
+
+	| announcedServer |
+	announcedServer := nil.
+	server port: 8181.
+	server announcer when: IrisMCPServerStarted do: [ :ann | announcedServer := ann server ] for: self.
+	server start.
+	server stop.
+	self assert: announcedServer identicalTo: server
+]
+
+{ #category : 'tests' }
+IrisMCPServerTest >> testServerStoppedAnnouncementCarriesServer [
+
+	| announcedServer |
+	announcedServer := nil.
+	server port: 8181.
+	server announcer when: IrisMCPServerStopped do: [ :ann | announcedServer := ann server ] for: self.
+	server start.
+	server stop.
+	self assert: announcedServer identicalTo: server
 ]
 
 { #category : 'tests' }
