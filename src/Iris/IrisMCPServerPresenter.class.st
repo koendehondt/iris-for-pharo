@@ -108,6 +108,12 @@ IrisMCPServerPresenter >> serverButtonLabel [
 	^ serverButton label
 ]
 
+{ #category : 'accessing - model' }
+IrisMCPServerPresenter >> setModelBeforeInitialization: anMCPServer [
+
+	server := anMCPServer
+]
+
 { #category : 'actions' }
 IrisMCPServerPresenter >> startLogging [
 

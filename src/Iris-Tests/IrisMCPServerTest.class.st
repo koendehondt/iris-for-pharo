@@ -21,7 +21,8 @@ IrisMCPServerTest >> makePostRequest: aBody [
 { #category : 'running' }
 IrisMCPServerTest >> setUp [
 
-	server := IrisMCPServer new
+	super setUp.
+	server := IrisMCPServer onPort: 7575
 ]
 
 { #category : 'tests' }
