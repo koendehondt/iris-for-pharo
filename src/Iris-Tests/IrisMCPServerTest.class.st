@@ -25,6 +25,13 @@ IrisMCPServerTest >> setUp [
 	server := IrisMCPServer onPort: 7575
 ]
 
+{ #category : 'running' }
+IrisMCPServerTest >> tearDown [
+
+	server stop.
+	super tearDown
+]
+
 { #category : 'tests' }
 IrisMCPServerTest >> testAnnouncerIsNotNil [
 
@@ -56,7 +63,7 @@ IrisMCPServerTest >> testDefaultLoggerIsNoLogger [
 ]
 
 { #category : 'tests' }
-IrisMCPServerTest >> testDefaultPort [
+IrisMCPServerTest >> testDefaultPortIs9999 [
 
 	self assert: IrisMCPServer new port equals: 9999
 ]
@@ -178,9 +185,7 @@ IrisMCPServerTest >> testNonPostReturns405 [
 { #category : 'tests' }
 IrisMCPServerTest >> testOnPortConstructor [
 
-	| s |
-	s := IrisMCPServer onPort: 7777.
-	self assert: s port equals: 7777
+	self assert: server port equals: 7575
 ]
 
 { #category : 'tests' }
@@ -188,6 +193,19 @@ IrisMCPServerTest >> testPortAccessor [
 
 	server port: 8080.
 	self assert: server port equals: 8080
+]
+
+{ #category : 'tests' }
+IrisMCPServerTest >> testPrintStringForNotRunningServer [
+
+	self assert: server printString equals: 'an IrisMCPServer on 7575 (not running)'
+]
+
+{ #category : 'tests' }
+IrisMCPServerTest >> testPrintStringForRunningServer [
+
+	server start.
+	self assert: server printString equals: 'an IrisMCPServer on 7575 (running)'
 ]
 
 { #category : 'tests' }
@@ -302,7 +320,6 @@ IrisMCPServerTest >> testServerStoppedAnnouncementCarriesServer [
 
 	| announcedServer |
 	announcedServer := nil.
-	server port: 8181.
 	server announcer when: IrisMCPServerStopped do: [ :ann | announcedServer := ann server ] for: self.
 	server start.
 	server stop.
@@ -326,8 +343,7 @@ IrisMCPServerTest >> testStartIsIdempotent [
 	server port: 8181.
 	server start.
 	server start.
-	self assert: server isRunning.
-	server stop
+	self assert: server isRunning
 ]
 
 { #category : 'tests' }

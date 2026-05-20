@@ -134,6 +134,18 @@ IrisMCPServer >> port: anInteger [
 	port := anInteger
 ]
 
+{ #category : 'printing' }
+IrisMCPServer >> printOn: aStream [
+
+	super printOn: aStream.
+	aStream
+		nextPutAll: ' on ';
+		print: self port.
+	self isRunning
+		ifTrue: [ aStream nextPutAll: ' (running)' ]
+		ifFalse: [ aStream nextPutAll: ' (not running)' ]
+]
+
 { #category : 'request handling' }
 IrisMCPServer >> processJsonRpc: aZnRequest [
 
