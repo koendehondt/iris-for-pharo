@@ -37,18 +37,6 @@ IrisMCPServerTest >> testAnnouncerReturnsSameInstance [
 ]
 
 { #category : 'tests' }
-IrisMCPServerTest >> testClassInitializationSetsNewCurrentServer [
-
-	self restoreCurrentServerAfter: [ :oldServer | | newServer |
-		IrisMCPServer initialize.
-		newServer := IrisMCPServer current.
-		self assert: IrisMCPServer current identicalTo: newServer.
-		self deny: oldServer isRunning.
-		self deny: newServer isRunning.
-		self deny: newServer isLogging ]
-]
-
-{ #category : 'tests' }
 IrisMCPServerTest >> testCurrentIsNotNil [
 
 	self assert: IrisMCPServer current notNil
@@ -323,13 +311,30 @@ IrisMCPServerTest >> testServerStoppedAnnouncementCarriesServer [
 { #category : 'tests' }
 IrisMCPServerTest >> testSetCurrent [
 
-	self restoreCurrentServerAfter: [ :oldServer | | newServer |
+	self restoreCurrentServerAfter: [ | newServer |
 		newServer := IrisMCPServer onPort: 7777.
 		IrisMCPServer current: newServer.
 		self assert: IrisMCPServer current identicalTo: newServer.
-		self deny: oldServer isRunning.
 		self deny: newServer isRunning.
 		self deny: newServer isLogging ]
+]
+
+{ #category : 'tests' }
+IrisMCPServerTest >> testStartIsIdempotent [
+
+	server port: 8181.
+	server start.
+	server start.
+	self assert: server isRunning.
+	server stop
+]
+
+{ #category : 'tests' }
+IrisMCPServerTest >> testStartLoggingIsIdempotent [
+
+	server startLogging.
+	server startLogging.
+	self assert: server isLogging
 ]
 
 { #category : 'tests' }
@@ -358,11 +363,27 @@ IrisMCPServerTest >> testStartingAndStopping [
 ]
 
 { #category : 'tests' }
+IrisMCPServerTest >> testStopIsIdempotent [
+
+	self deny: server isRunning.
+	server stop.
+	self deny: server isRunning
+]
+
+{ #category : 'tests' }
 IrisMCPServerTest >> testStopLoggingClearsLog [
 
 	server startLogging.
 	server stopLogging.
 	self assert: server log isEmpty
+]
+
+{ #category : 'tests' }
+IrisMCPServerTest >> testStopLoggingIsIdempotent [
+
+	self deny: server isLogging.
+	server stopLogging.
+	self deny: server isLogging
 ]
 
 { #category : 'tests' }

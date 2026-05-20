@@ -25,9 +25,6 @@ IrisMCPServer class >> current [
 { #category : 'accessing' }
 IrisMCPServer class >> current: aServer [
 
-	| wasRunning |
-	wasRunning := Current notNil and: [ Current isRunning ].
-	wasRunning ifTrue: [ Current stop ].
 	Current := aServer
 ]
 
@@ -159,6 +156,7 @@ IrisMCPServer >> processJsonRpc: aZnRequest [
 { #category : 'start/stop' }
 IrisMCPServer >> start [
 
+	self isRunning ifTrue: [ ^ self ].
 	server := ZnServer on: port.
 	server onRequestRespond: [ :request | self handleRequest: request ].
 	server start.
@@ -168,6 +166,7 @@ IrisMCPServer >> start [
 { #category : 'logging' }
 IrisMCPServer >> startLogging [
 
+	self isLogging ifTrue: [ ^ self ].
 	logger := IrisMCPLogger new.
 	self announcer announce: (IrisMCPLoggingStarted on: self)
 ]
@@ -175,13 +174,15 @@ IrisMCPServer >> startLogging [
 { #category : 'start/stop' }
 IrisMCPServer >> stop [
 
-	server ifNotNil: [ server stop ].
+	self isRunning ifFalse: [ ^ self ].
+	server stop.
 	self announcer announce: (IrisMCPServerStopped on: self)
 ]
 
 { #category : 'logging' }
 IrisMCPServer >> stopLogging [
 
+	self isLogging ifFalse: [ ^ self ].
 	logger := IrisMCPNoLogger new.
 	self announcer announce: (IrisMCPLoggingStopped on: self)
 ]

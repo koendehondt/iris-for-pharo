@@ -27,12 +27,17 @@ Available tools: eval, get_class, get_method, list_classes, run_tests.
 { #category : 'tests' }
 IrisMCPTest >> testOpenServer [
 
-	| presenter |
+	| existingPresenter newPresenter |
+	existingPresenter := IrisMCPServerPresenter allInstances 
+		detect: [ :p | p window notNil and: [ p window isOpen ] ]
+		ifNone: [ nil ].
 	[
-		presenter := IrisMCP openServer.
-		self assert: presenter window isOpen
+		newPresenter := IrisMCP openServer.
+		self assert: newPresenter window isOpen
 	] ensure: [
-		presenter ifNotNil: [ presenter window close ] ]
+		"Only close if we opened a new window"
+		(existingPresenter isNil and: [ newPresenter notNil ])
+			ifTrue: [ newPresenter window close ] ]
 ]
 
 { #category : 'tests' }
