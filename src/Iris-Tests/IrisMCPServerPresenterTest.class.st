@@ -24,10 +24,10 @@ IrisMCPServerPresenterTest >> testAboutTitle [
 { #category : 'tests' }
 IrisMCPServerPresenterTest >> testStartingAndStopping [
 
-	self restoreCurrentServerAfter: [ | server |
-		server := IrisMCPServer onPort: 6666.
-		IrisMCPServer current: server.
-		presenter := IrisMCPServerPresenter new.
+	self restoreCurrentServerAfter: [ | mcpServer |
+		mcpServer := IrisMCPServer onPort: 6666.
+		IrisMCPServer current: mcpServer.
+		presenter := IrisMCPServerPresenter on: mcpServer.
 		presenter open.
 		self assert: presenter window title equals: 'Iris MCP Server (not running)'.
 		self assert: presenter serverButtonLabel equals: 'Start server'.

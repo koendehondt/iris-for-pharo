@@ -5,7 +5,8 @@ Class {
 		'serverButton',
 		'loggingButton',
 		'logList',
-		'logEntryPresenter'
+		'logEntryPresenter',
+		'server'
 	],
 	#category : 'Iris-UI',
 	#package : 'Iris',
@@ -62,8 +63,7 @@ IrisMCPServerPresenter >> initializePresenters [
 	logList := self newTable.
 	logList
 		addColumn: (((SpStringTableColumn title: 'Tool' evaluated: [ :entry | entry displayToolName ]) width: 80) displayBold: [ :entry | true ]);
-		addColumn: (SpStringTableColumn title: 'Argument' evaluated: [ :entry | entry requestArgument ]);
-		items: self server log.
+		addColumn: (SpStringTableColumn title: 'Argument' evaluated: [ :entry | entry requestArgument ]).
 	logEntryPresenter := self instantiate: IrisMCPLogEntryPresenter
 ]
 
@@ -99,7 +99,7 @@ IrisMCPServerPresenter >> refreshLog [
 { #category : 'accessing' }
 IrisMCPServerPresenter >> server [
 
-	^ IrisMCPServer current
+	^ server
 ]
 
 { #category : 'test api' }

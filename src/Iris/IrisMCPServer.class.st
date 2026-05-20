@@ -3,10 +3,10 @@ Class {
 	#superclass : 'Object',
 	#instVars : [
 		'port',
-		'server',
 		'dispatcher',
 		'logger',
-		'announcer'
+		'announcer',
+		'httpServer'
 	],
 	#classVars : [
 		'Current'
@@ -95,7 +95,7 @@ IrisMCPServer >> isLogging [
 { #category : 'testing' }
 IrisMCPServer >> isRunning [
 
-	^ server notNil and: [ server isRunning ]
+	^ httpServer notNil and: [ httpServer isRunning ]
 ]
 
 { #category : 'logging' }
@@ -157,9 +157,9 @@ IrisMCPServer >> processJsonRpc: aZnRequest [
 IrisMCPServer >> start [
 
 	self isRunning ifTrue: [ ^ self ].
-	server := ZnServer on: port.
-	server onRequestRespond: [ :request | self handleRequest: request ].
-	server start.
+	httpServer := ZnServer on: port.
+	httpServer onRequestRespond: [ :request | self handleRequest: request ].
+	httpServer start.
 	self announcer announce: (IrisMCPServerStarted on: self)
 ]
 
@@ -175,7 +175,7 @@ IrisMCPServer >> startLogging [
 IrisMCPServer >> stop [
 
 	self isRunning ifFalse: [ ^ self ].
-	server stop.
+	httpServer stop.
 	self announcer announce: (IrisMCPServerStopped on: self)
 ]
 

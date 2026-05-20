@@ -57,7 +57,7 @@ IrisMCPServerTest >> testDefaultLoggerIsNoLogger [
 { #category : 'tests' }
 IrisMCPServerTest >> testDefaultPort [
 
-	self assert: server port equals: 9999
+	self assert: IrisMCPServer new port equals: 9999
 ]
 
 { #category : 'tests' }

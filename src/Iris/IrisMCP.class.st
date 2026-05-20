@@ -36,14 +36,18 @@ IrisMCP class >> aboutText [
 IrisMCP class >> openServer [
 
 	^ IrisMCPServerPresenter allInstances
-		detect: [ :presenter | presenter window ifNil: [ false ] ifNotNil: [ :window | window isOpen ] ]
-		ifFound: [ :presenter |
+		detect: [ :presenter | 
+			presenter window notNil 
+				and: [ presenter window isOpen 
+				and: [ presenter server == IrisMCPServer current ] ] ]
+		ifFound: [ :presenter | 
 			presenter window activate.
 			presenter ]
-		ifNone: [
-			IrisMCPServerPresenter new
-				open;
-				yourself ]
+		ifNone: [ 
+			| presenter |
+			presenter := IrisMCPServerPresenter on: IrisMCPServer current.
+			presenter open.
+			presenter ]
 ]
 
 { #category : 'accessing' }
