@@ -51,8 +51,11 @@ IrisMCPLogEntryTest >> testDisplayToolName [
 	self assert: IrisMCPEvalLogEntry new displayToolName equals: 'eval'.
 	self assert: IrisMCPGetClassLogEntry new displayToolName equals: 'get_class'.
 	self assert: IrisMCPGetMethodLogEntry new displayToolName equals: 'get_method'.
+	self assert: IrisMCPInitializeLogEntry new displayToolName equals: 'initialize'.
+	self assert: IrisMCPInitializedNotificationLogEntry new displayToolName equals: 'initialized'.
 	self assert: IrisMCPRunTestsLogEntry new displayToolName equals: 'run_tests'.
-	self assert: IrisMCPListClassesLogEntry new displayToolName equals: 'list_classes'
+	self assert: IrisMCPListClassesLogEntry new displayToolName equals: 'list_classes'.
+	self assert: IrisMCPToolsListLogEntry new displayToolName equals: 'tools'
 ]
 
 { #category : 'tests' }
@@ -126,6 +129,38 @@ IrisMCPLogEntryTest >> testGetMethodRequestArgument [
 ]
 
 { #category : 'tests' }
+IrisMCPLogEntryTest >> testInitializeLogEntryPrintString [
+
+	| body request entry |
+	body := NeoJSONWriter toString: (Dictionary new
+		at: 'jsonrpc' put: '2.0';
+		at: 'id' put: 1;
+		at: 'method' put: 'initialize';
+		at: 'params' put: (Dictionary new
+			at: 'protocolVersion' put: '2025-03-26';
+			yourself);
+		yourself).
+	request := self requestFor: body.
+	entry := IrisMCPLogger new logEntryFor: request.
+	self assert: (entry isKindOf: IrisMCPInitializeLogEntry).
+	self assert: entry printString equals: 'initialize'
+]
+
+{ #category : 'tests' }
+IrisMCPLogEntryTest >> testInitializedNotificationLogEntryPrintString [
+
+	| body request entry |
+	body := NeoJSONWriter toString: (Dictionary new
+		at: 'jsonrpc' put: '2.0';
+		at: 'method' put: 'notifications/initialized';
+		yourself).
+	request := self requestFor: body.
+	entry := IrisMCPLogger new logEntryFor: request.
+	self assert: (entry isKindOf: IrisMCPInitializedNotificationLogEntry).
+	self assert: entry printString equals: 'notifications/initialized'
+]
+
+{ #category : 'tests' }
 IrisMCPLogEntryTest >> testListClassesLogEntryPrintString [
 
 	| request entry |
@@ -179,12 +214,62 @@ IrisMCPLogEntryTest >> testRunTestsRequestArgument [
 ]
 
 { #category : 'tests' }
+IrisMCPLogEntryTest >> testToolsListLogEntryPrintString [
+
+	| body request entry |
+	body := NeoJSONWriter toString: (Dictionary new
+		at: 'jsonrpc' put: '2.0';
+		at: 'id' put: 1;
+		at: 'method' put: 'tools/list';
+		yourself).
+	request := self requestFor: body.
+	entry := IrisMCPLogger new logEntryFor: request.
+	self assert: (entry isKindOf: IrisMCPToolsListLogEntry).
+	self assert: entry printString equals: 'tools/list'
+]
+
+{ #category : 'tests' }
+IrisMCPLogEntryTest >> testToolsListResponseText [
+
+	| reqBody reqEntity znRequest responseEntity entry dispatcher rpcRequest rpcResponse znResponse |
+	reqBody := NeoJSONWriter toString: (Dictionary new
+		at: 'jsonrpc' put: '2.0';
+		at: 'id' put: 1;
+		at: 'method' put: 'tools/list';
+		yourself).
+	reqEntity := ZnEntity with: reqBody type: ZnMimeType applicationJson.
+	znRequest := ZnRequest post: 'http://localhost:9999/mcp'.
+	znRequest entity: reqEntity.
+
+	dispatcher := IrisMCPDispatcher new registerDefaultTools.
+	rpcRequest := IrisMCPJsonRpcRequest new
+		method: 'tools/list';
+		params: Dictionary new;
+		yourself.
+	rpcResponse := dispatcher dispatch: rpcRequest.
+	responseEntity := ZnEntity with: rpcResponse asJson type: ZnMimeType applicationJson.
+	znResponse := ZnResponse ok: responseEntity.
+
+	entry := IrisMCPToolsListLogEntry new
+		request: znRequest;
+		response: znResponse;
+		yourself.
+
+	self assert: entry responseText equals:
+'list_classes: Lists all classes in the Pharo image, optionally filtered by name prefix and/or package name.
+eval: Evaluates a Smalltalk expression in the Pharo image and returns the printString of the result.
+run_tests: Runs a TestCase class (or a single test method) and returns a summary of results including pass/fail/error counts and failure messages. Alternatively, runs all TestCase subclasses in a package.
+get_class: Returns the definition and all method sources for a named Pharo class, including both instance-side and class-side methods.
+get_method: Returns the source of a single method. Provide class_name and selector. Optionally set class_side to true for class-side methods.'
+]
+
+{ #category : 'tests' }
 IrisMCPLogEntryTest >> testUnknownLogEntryPrintString [
 
 	| body request entry |
 	body := NeoJSONWriter toString: (Dictionary new
 		at: 'jsonrpc' put: '2.0';
-		at: 'method' put: 'initialize';
+		at: 'method' put: 'unknown/method';
 		yourself).
 	request := self requestFor: body.
 	entry := IrisMCPLogger new logEntryFor: request.

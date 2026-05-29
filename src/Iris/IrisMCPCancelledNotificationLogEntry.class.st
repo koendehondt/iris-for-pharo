@@ -1,6 +1,6 @@
 Class {
 	#name : 'IrisMCPCancelledNotificationLogEntry',
-	#superclass : 'IrisMCPLogEntry',
+	#superclass : 'IrisMCPNotificationLogEntry',
 	#category : 'Iris-Logging',
 	#package : 'Iris',
 	#tag : 'Logging'
@@ -10,12 +10,6 @@ Class {
 IrisMCPCancelledNotificationLogEntry class >> toolName [
 
 	^ 'notifications/cancelled'
-]
-
-{ #category : 'accessing' }
-IrisMCPCancelledNotificationLogEntry >> displayToolName [
-
-	^ 'cancelled'
 ]
 
 { #category : 'accessing' }
