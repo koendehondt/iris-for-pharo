@@ -22,13 +22,28 @@ It allows Claude Desktop (or any MCP client) to inspect and interact with a runn
 
 ## Architecture
 
+Iris exposes an HTTP server accepting JSON-RPC requests following MCP on a `/mcp` endpoint.
+Many agents expect a binary that speaks the same protocol over its standard input and output.
+In those cases you need a proxy to translate between the two.
+In that case, the flow is as follows:
+
 ```
 Claude Desktop
     ↕ stdio
 mcp-remote (Node.js proxy)
-    ↕ HTTP POST /mcp
+    ↕ HTTP POST /mcp JSON-RPC
 Pharo Image (Zinc HTTP server on port 9999)
 ```
+
+Some agents can talk directly to a `remote` MCP server like Iris, even though it runs locally.
+In that case, the flow is simpler:
+
+```
+OpenCode
+    ↕ HTTP POST /mcp JSON-RPC
+Pharo Image (Zinc HTTP server on port 9999)
+```
+
 
 ## Installation
 
@@ -111,3 +126,25 @@ Install [mcp-remote](https://github.com/geelen/mcp-remote) and add to `~/Library
   }
 }
 ```
+
+
+## OpenCode Configuration
+
+Edit OpenCode's configuration file, `~/.config/opencode/opencode.jsonc` along this example:
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "servers": {
+      "pharo": { "type": "remote", "url": "http://127.0.0.1:9999/mcp" }
+    }
+  }
+}
+```
+
+If you check the list of MCP servers available in OpenCode and Iris is not yet running,
+it will mark and cache that MCP server as unavailable during that session. 
+You need to reload or restart OpenCode once Iris is running.
+
+Using `127.0.0.1` instead of `localhost` signals more clearly that Iris binds only on IPv4.
