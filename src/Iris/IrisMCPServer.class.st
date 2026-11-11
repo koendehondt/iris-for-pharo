@@ -55,6 +55,14 @@ IrisMCPServer >> badRequestResponse: aMessage [
 ]
 
 { #category : 'accessing' }
+IrisMCPServer >> bindingAddress [
+	"Answer the address the HTTP server listens on, or nil when it is not running."
+
+	^ self isRunning
+		ifTrue: [ httpServer bindingAddress ]
+]
+
+{ #category : 'accessing' }
 IrisMCPServer >> dispatcher [
 
 	^ dispatcher
@@ -66,9 +74,19 @@ IrisMCPServer >> dispatcher: anMCPDispatcher [
 	dispatcher := anMCPDispatcher
 ]
 
+{ #category : 'responses' }
+IrisMCPServer >> forbiddenResponse [
+
+	^ (ZnResponse statusLine: ZnStatusLine forbidden)
+		entity: (ZnEntity text: 'Origin not allowed');
+		yourself
+]
+
 { #category : 'request handling' }
 IrisMCPServer >> handleRequest: aZnRequest [
 
+	(self isAllowedOrigin: aZnRequest)
+		ifFalse: [ ^ self forbiddenResponse ].
 	aZnRequest method = #POST
 		ifFalse: [ ^ ZnResponse methodNotAllowed: aZnRequest ].
 	(aZnRequest uri path = 'mcp')
@@ -86,6 +104,20 @@ IrisMCPServer >> initialize [
 	logger := IrisMCPNoLogger new
 ]
 
+{ #category : 'request handling' }
+IrisMCPServer >> isAllowedOrigin: aZnRequest [
+	"Guard against DNS rebinding, as required by the MCP Streamable HTTP transport.
+	Requests without an Origin header come from non-browser clients and are allowed.
+	Browser requests are only allowed from pages served by this machine."
+
+	| origin host |
+	origin := aZnRequest headers at: 'Origin' ifAbsent: [ ^ true ].
+	host := [ origin asZnUrl host ]
+		on: Error
+		do: [ ^ false ].
+	^ self localHostNames includes: host
+]
+
 { #category : 'testing' }
 IrisMCPServer >> isLogging [
 
@@ -96,6 +128,12 @@ IrisMCPServer >> isLogging [
 IrisMCPServer >> isRunning [
 
 	^ httpServer notNil and: [ httpServer isRunning ]
+]
+
+{ #category : 'request handling' }
+IrisMCPServer >> localHostNames [
+
+	^ #( 'localhost' '127.0.0.1' )
 ]
 
 { #category : 'logging' }
@@ -113,13 +151,9 @@ IrisMCPServer >> notFoundResponse [
 { #category : 'responses' }
 IrisMCPServer >> okResponseWith: aString [
 
-	| response |
-	response := ZnResponse ok: (ZnEntity
+	^ ZnResponse ok: (ZnEntity
 		with: aString
-		type: ZnMimeType applicationJson).
-	response headers
-		at: 'Access-Control-Allow-Origin' put: '*'.
-	^ response
+		type: ZnMimeType applicationJson)
 ]
 
 { #category : 'accessing' }
@@ -169,7 +203,9 @@ IrisMCPServer >> processJsonRpc: aZnRequest [
 IrisMCPServer >> start [
 
 	self isRunning ifTrue: [ ^ self ].
-	httpServer := ZnServer on: port.
+	httpServer := (ZnServer on: port)
+		bindingAddress: NetNameResolver loopBackAddress;
+		yourself.
 	httpServer onRequestRespond: [ :request | self handleRequest: request ].
 	httpServer start.
 	self announcer announce: (IrisMCPServerStarted on: self)

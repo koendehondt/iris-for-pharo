@@ -18,6 +18,15 @@ IrisMCPServerTest >> makePostRequest: aBody [
 	^ req
 ]
 
+{ #category : 'helpers' }
+IrisMCPServerTest >> makePostRequest: aBody origin: anOriginString [
+
+	| req |
+	req := self makePostRequest: aBody.
+	req headers at: 'Origin' put: anOriginString.
+	^ req
+]
+
 { #category : 'running' }
 IrisMCPServerTest >> setUp [
 
@@ -42,6 +51,12 @@ IrisMCPServerTest >> testAnnouncerIsNotNil [
 IrisMCPServerTest >> testAnnouncerReturnsSameInstance [
 
 	self assert: server announcer identicalTo: server announcer
+]
+
+{ #category : 'tests - binding' }
+IrisMCPServerTest >> testBindingAddressIsNilWhenNotRunning [
+
+	self assert: server bindingAddress isNil
 ]
 
 { #category : 'tests' }
@@ -84,6 +99,25 @@ IrisMCPServerTest >> testEmptyBodyReturnsError [
 	req := ZnRequest post: 'http://localhost:9999/mcp'.
 	response := server handleRequest: req.
 	self assert: response status equals: 500
+]
+
+{ #category : 'tests - origin' }
+IrisMCPServerTest >> testForbiddenRequestIsNotDispatched [
+
+	| response |
+	server startLogging.
+	response := server handleRequest: (self makePostRequest: self toolsListBody origin: 'http://evil.example.com').
+	self assert: response status equals: 403.
+	self assert: server log isEmpty
+]
+
+{ #category : 'tests - origin' }
+IrisMCPServerTest >> testForeignOriginIsForbiddenBeforeMethodCheck [
+
+	| req |
+	req := ZnRequest get: 'http://localhost:9999/mcp'.
+	req headers at: 'Origin' put: 'http://evil.example.com'.
+	self assert: (server handleRequest: req) status equals: 403
 ]
 
 { #category : 'tests' }
@@ -208,6 +242,30 @@ IrisMCPServerTest >> testPrintStringForRunningServer [
 	self assert: server printString equals: 'an IrisMCPServer on 7575 (running)'
 ]
 
+{ #category : 'tests - origin' }
+IrisMCPServerTest >> testRequestFromForeignOriginIsForbidden [
+
+	| response |
+	response := server handleRequest: (self makePostRequest: self toolsListBody origin: 'http://evil.example.com').
+	self assert: response status equals: 403
+]
+
+{ #category : 'tests - origin' }
+IrisMCPServerTest >> testRequestFromLocalhostOriginIsAccepted [
+
+	| response |
+	response := server handleRequest: (self makePostRequest: self toolsListBody origin: 'http://localhost:4200').
+	self assert: response status equals: 200
+]
+
+{ #category : 'tests - origin' }
+IrisMCPServerTest >> testRequestFromLoopbackIpOriginIsAccepted [
+
+	| response |
+	response := server handleRequest: (self makePostRequest: self toolsListBody origin: 'http://127.0.0.1:8080').
+	self assert: response status equals: 200
+]
+
 { #category : 'tests' }
 IrisMCPServerTest >> testRequestIsLoggedWhenLoggingEnabled [
 
@@ -267,6 +325,22 @@ IrisMCPServerTest >> testRequestLoggedAnnouncementNotFiredWhenNotLogging [
 	self deny: announced
 ]
 
+{ #category : 'tests - origin' }
+IrisMCPServerTest >> testRequestWithNullOriginIsForbidden [
+
+	| response |
+	response := server handleRequest: (self makePostRequest: self toolsListBody origin: 'null').
+	self assert: response status equals: 403
+]
+
+{ #category : 'tests - origin' }
+IrisMCPServerTest >> testRequestWithoutOriginIsAccepted [
+
+	| response |
+	response := server handleRequest: (self makePostRequest: self toolsListBody).
+	self assert: response status equals: 200
+]
+
 { #category : 'tests' }
 IrisMCPServerTest >> testResponseBodyIsValidJson [
 
@@ -290,17 +364,33 @@ IrisMCPServerTest >> testResponseBodyIsValidJson [
 				with: 'name' -> 'pharo-mcp-server')))
 ]
 
-{ #category : 'tests' }
-IrisMCPServerTest >> testResponseHasCorsHeader [
+{ #category : 'tests - origin' }
+IrisMCPServerTest >> testResponseHasNoCorsHeader [
 
-	| body response |
-	body := NeoJSONWriter toString: (Dictionary
-		with: 'jsonrpc' -> '2.0'
-		with: 'id' -> 1
-		with: 'method' -> 'tools/list'
-		with: 'params' -> Dictionary new).
-	response := server handleRequest: (self makePostRequest: body).
-	self assert: (response headers at: 'Access-Control-Allow-Origin') equals: '*'
+	| response |
+	response := server handleRequest: (self makePostRequest: self toolsListBody).
+	self deny: (response headers includesKey: 'Access-Control-Allow-Origin')
+]
+
+{ #category : 'tests - binding' }
+IrisMCPServerTest >> testRunningServerIsBoundToLoopbackOnly [
+
+	server start.
+	self assert: server bindingAddress equals: NetNameResolver loopBackAddress
+]
+
+{ #category : 'tests - binding' }
+IrisMCPServerTest >> testServerIsReachableOnLoopback [
+
+	| response |
+	server start.
+	response := ZnClient new
+		url: 'http://127.0.0.1:7575/mcp';
+		entity: (ZnEntity with: self toolsListBody type: ZnMimeType applicationJson);
+		timeout: 5;
+		post;
+		response.
+	self assert: response status equals: 200
 ]
 
 { #category : 'tests' }
@@ -431,4 +521,14 @@ IrisMCPServerTest >> testWrongPathReturns404 [
 	req := ZnRequest post: 'http://localhost:9999/wrong'.
 	req entity: (ZnEntity with: '{}' type: ZnMimeType applicationJson).
 	self assert: (server handleRequest: req) status equals: 404
+]
+
+{ #category : 'helpers' }
+IrisMCPServerTest >> toolsListBody [
+
+	^ NeoJSONWriter toString: (Dictionary
+		with: 'jsonrpc' -> '2.0'
+		with: 'id' -> 1
+		with: 'method' -> 'tools/list'
+		with: 'params' -> Dictionary new)
 ]
